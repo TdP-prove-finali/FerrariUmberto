@@ -19,14 +19,20 @@ public class StationsDAO {
 			st.setInt(15, station.getId());
 			
 			st.setString(2, station.getCommonName());
-			st.setString(3, station.getTerminalName());
+			st.setInt(3, station.getTerminalName());
 			st.setBoolean(4, station.isInstalled());
 			st.setBoolean(5, station.isLocked());
-			st.setDate(6, Date.valueOf(station.getInstallDate()));
-			st.setDate(7, Date.valueOf(station.getRemovalDate()));
+			if(station.getInstallDate() != null)
+				st.setDate(6, Date.valueOf(station.getInstallDate()));
+			else
+				st.setDate(6, null);
+			if(station.getRemovalDate() != null)
+				st.setDate(7, Date.valueOf(station.getRemovalDate()));
+			else
+				st.setDate(7, null);
 			st.setBoolean(8, station.isTemporary());
 			st.setInt(9, station.getNumBikes());
-			st.setInt(10, station.getNumEmpityDocks());
+			st.setInt(10, station.getNumEmptyDocks());
 			st.setInt(11, station.getNumDocks());
 			st.setDouble(12, station.getLatitude());
 			st.setDouble(13, station.getLongitude());

@@ -23,7 +23,7 @@ public class ParseJSONStations {
 	 * @return ritorna la lista delle stazioni
 	 */
 	public static List<Station> parse(String directory) {
-		Path path = Paths.get("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Stazioni\\s.txt");
+		Path path = Paths.get(directory);
 		List<Station> stations = new ArrayList<Station>();
  
 		JSONArray jsonArray = null;
@@ -50,15 +50,19 @@ public class ParseJSONStations {
 				Double longitude = jsonStation.getDouble("lon");
 				
 				Station station = new Station(id, commonName, latitude, longitude);
-				/*
+				
 				JSONArray properties = jsonStation.getJSONArray("additionalProperties");
-				for(int j = 0; j < properties.length(); i++) {
+				for(int j = 0; j < properties.length(); j++) {
 					JSONObject property = properties.getJSONObject(j);
 					String key = property.getString("key");
 					
 					switch(key) {
 						case "TerminalName":
-							station.setTerminalName(property.getString("value"));
+							try {
+								station.setTerminalName(Integer.parseInt(property.getString("value")));
+							} catch(NumberFormatException e) {
+								station.setTerminalName(null);							
+							}	
 							break;
 						case "Installed": 
 							station.setInstalled(Boolean.parseBoolean(property.getString("value")));
@@ -67,10 +71,12 @@ public class ParseJSONStations {
 							station.setLocked(Boolean.parseBoolean(property.getString("value")));
 							break;
 						case "InstallDate":
-							station.setInstallDate(LocalDate.ofInstant(Instant.ofEpochMilli(Long.parseLong(property.getString("value"))), TimeZone.getDefault().toZoneId()));
+							if(!property.getString("value").isEmpty())
+								station.setInstallDate(LocalDate.ofInstant(Instant.ofEpochMilli(Long.parseLong(property.getString("value"))), TimeZone.getDefault().toZoneId()));
 							break;
 						case "RemovalDate":
-							station.setRemovalDate(LocalDate.ofInstant(Instant.ofEpochMilli(Long.parseLong(property.getString("value"))), TimeZone.getDefault().toZoneId()));
+							if(!property.getString("value").isEmpty())
+								station.setRemovalDate(LocalDate.ofInstant(Instant.ofEpochMilli(Long.parseLong(property.getString("value"))), TimeZone.getDefault().toZoneId()));
 							break;
 						case "Temporary":
 							station.setTemporary(Boolean.parseBoolean(property.getString("value")));
@@ -83,12 +89,12 @@ public class ParseJSONStations {
 								station.setNumBikes(0);
 							}
 							break;
-						case "NbEmpityDocks":
+						case "NbEmptyDocks":
 							try {
-								station.setNumEmpityDocks(Integer.parseInt(property.getString("value")));
+								station.setNumEmptyDocks(Integer.parseInt(property.getString("value")));
 
 							} catch(NumberFormatException e) {
-								station.setNumEmpityDocks(0);
+								station.setNumEmptyDocks(0);
 							}
 							break;
 						case "NbDocks":
@@ -101,9 +107,9 @@ public class ParseJSONStations {
 							break;
 					}
 				}
-				if(station.getNumDocks() - (station.getNumBikes() + station.getNumEmpityDocks()) != 0)
+				if(station.getNumDocks() - (station.getNumBikes() + station.getNumEmptyDocks()) != 0)
 					station.setBroken(true);
-				*/
+				
 				stations.add(station);
 			} catch(JSONException e) {}
 		}

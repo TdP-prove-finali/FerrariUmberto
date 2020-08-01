@@ -5,7 +5,8 @@ public class TestDataImport {
 	public static void main(String[] args) {
 		System.out.println("INIZIO");
 		DataImport di = new DataImport();
-		di.parseJSONStations("123");
+		di.parseJSONStations("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Stazioni\\s.txt");
+		di.parseCSVRentals("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Viaggi\\prova.csv");
 		System.out.println("FINE");
 	}
 

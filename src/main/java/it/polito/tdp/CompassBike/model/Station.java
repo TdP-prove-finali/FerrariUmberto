@@ -6,14 +6,14 @@ public class Station {
 	
 	private Integer id;
 	private String commonName;
-	private String terminalName;
+	private Integer terminalName;
 	private boolean isInstalled;
 	private boolean isLocked;
 	private LocalDate installDate;
 	private LocalDate removalDate;
 	private boolean isTemporary;
 	private Integer numBikes;
-	private Integer numEmpityDocks;
+	private Integer numEmptyDocks;
 	private Integer numDocks;
 	private Double latitude;
 	private Double longitude;
@@ -28,11 +28,11 @@ public class Station {
 		this.longitude = longitude;
 	}
 
-	public String getTerminalName() {
+	public Integer getTerminalName() {
 		return terminalName;
 	}
 
-	public void setTerminalName(String terminalName) {
+	public void setTerminalName(Integer terminalName) {
 		this.terminalName = terminalName;
 	}
 
@@ -84,12 +84,12 @@ public class Station {
 		this.numBikes = numBikes;
 	}
 
-	public Integer getNumEmpityDocks() {
-		return numEmpityDocks;
+	public Integer getNumEmptyDocks() {
+		return numEmptyDocks;
 	}
 
-	public void setNumEmpityDocks(Integer numEmpityDocks) {
-		this.numEmpityDocks = numEmpityDocks;
+	public void setNumEmptyDocks(Integer numEmpityDocks) {
+		this.numEmptyDocks = numEmpityDocks;
 	}
 
 	public Integer getNumDocks() {
