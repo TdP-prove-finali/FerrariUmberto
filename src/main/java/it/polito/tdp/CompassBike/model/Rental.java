@@ -26,7 +26,6 @@ public class Rental {
 
 	public Rental(Integer id, Integer bikeId, LocalDateTime startDate, Integer startStationId,
 			String startStationCommonName) {
-		super();
 		this.id = id;
 		this.bikeId = bikeId;
 		this.startDate = startDate;
@@ -83,7 +82,33 @@ public class Rental {
 		return bikeId;
 	}
 	
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Rental other = (Rental) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+
 	public String toString() {
 		return this.id+" "+this.bikeId+" "+this.startStationId+" "+this.endStationId;
 	}

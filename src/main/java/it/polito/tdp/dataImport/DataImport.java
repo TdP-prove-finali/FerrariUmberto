@@ -1,6 +1,7 @@
 package it.polito.tdp.dataImport;
 
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.CompassBike.DAO.BikeDAO;
 import it.polito.tdp.CompassBike.DAO.RentalsDAO;
@@ -20,9 +21,12 @@ public class DataImport {
 	public void parseCSVRentals(String directory) {
 		// TODO Controllo errore impossibile leggere file
 		List<Rental> rentals = ParseCSVRentals.parse(directory);
+		Map<Integer, Station> stationsIdMap = StationsDAO.getAllStations();
 		for(Rental rental : rentals) {
-			BikeDAO.addBike(rental);
-			RentalsDAO.addRental(rental);
+			if(stationsIdMap.containsKey(rental.getStartStationId()) && stationsIdMap.containsKey(rental.getEndStationId())) {
+				BikeDAO.addBike(rental);
+				RentalsDAO.addRental(rental);
+			}
 		}
 	}
 

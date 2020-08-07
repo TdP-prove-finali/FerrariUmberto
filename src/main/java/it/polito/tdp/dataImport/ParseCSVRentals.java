@@ -28,10 +28,10 @@ public class ParseCSVRentals {
             	int start = 0;
             	boolean inQuotes = false;
             	for(int i = 0; i < line.length(); i++) {
-            		if(line.charAt(i) == '\"' && i != line.length() -1 && line.charAt(i+1) == '\"')
+            		if(line.charAt(i) == '\"')
             			inQuotes = !inQuotes;
             		if(i == line.length() - 1)
-            			values.add(line.substring(start));
+            			values.add(line.substring(start).replace("\"", ""));
             		else if(line.charAt(i) == ',' && !inQuotes) {
             			values.add(line.substring(start, i).replace("\"", ""));
             			start = i + 1;
@@ -42,6 +42,7 @@ public class ParseCSVRentals {
                 
                 // TODO Fare controllo errore per la lettura di questi parametri
                 Integer id = Integer.parseInt(values.get(0));
+                // TODO Non funziona nel modo giusto il passaggio del parametro Duration
                 Duration duration = Duration.of(Integer.parseInt(values.get(1)), ChronoUnit.MINUTES);
                 Integer bikeId = Integer.parseInt(values.get(2));
                 LocalDateTime endDate = LocalDateTime.parse(values.get(3),formatter);
