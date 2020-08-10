@@ -18,7 +18,6 @@ import it.polito.tdp.CompassBike.model.Event.EventType;
 public class EventsGenerator {
 	
 	// TODO Implementare la scelta del periodo di tempo e non solo il giorno
-	// TODO Da cambiare StationData con Station
 	
 	private Graph<Station, RouteEdge> graph;
 	
@@ -31,10 +30,10 @@ public class EventsGenerator {
 	private Integer numRentals;
 	
 	// Incertezza sul numero di noleggi da generare, default 2%.
-	private final Double uncertainty = 0.02; // TODO Permettere all'utente di variare questo parametro.
+	private Double uncertainty = 0.02;
 	
 	// Aumento o diminuzione del numero di noleggi da generare, default 0%.
-	private Double variation = 0.0; // TODO Permettere all'utente di inserire questo parametro.
+	private Double variation = 0.0;
 	
 	private Map<Integer, Station> stationsIdMap;
 	
@@ -153,6 +152,15 @@ public class EventsGenerator {
 	 */
 	public void setVariation(Double variation) {
 		this.variation = variation / 100.0;
+	}
+	
+	
+	/**
+	 * Permette di variare il valore percentuale di incertezza sul numero di noleggi da generare.
+	 * @param uncertainty Valore di incertezza scelto
+	 */
+	public void setUncertainty(Double uncertainty) {
+		this.uncertainty = uncertainty;
 	}
 
 }

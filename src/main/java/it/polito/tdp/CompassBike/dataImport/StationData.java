@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 public class StationData {
 	
-	// TODO Spostare nel package DAO o dataImport
-	
 	private Integer id;
 	private String commonName;
 	private Integer terminalName;

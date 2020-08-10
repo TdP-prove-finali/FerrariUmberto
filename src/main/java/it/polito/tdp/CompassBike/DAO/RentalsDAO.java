@@ -19,7 +19,7 @@ import it.polito.tdp.CompassBike.dataImport.Rental;
 import it.polito.tdp.CompassBike.model.Route;
 import it.polito.tdp.CompassBike.model.Station;
 
-public class RentalsDAO { // TODO Tutta la documentazione
+public class RentalsDAO {
 	
 	// TODO Considerare tutte le restrizioni sul singolo giorno se corrette o da fare sul periodo
 

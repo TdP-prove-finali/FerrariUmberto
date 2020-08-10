@@ -378,6 +378,7 @@ public class Simulator {
 	}
 	
 	
+	// TODO Metodi provvisori
 	public Map<Integer, Station> getStations() {
 		return this.stations;
 	}

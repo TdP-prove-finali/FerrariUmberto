@@ -58,7 +58,6 @@ public class StationsDAO {
 	
 	/**
 	 * Permette di ottenere tutte le stazioni attualmente memorizzate nel db, sotto forma di mappa.
-	 * 
 	 * @return La {@link Map mappa} con l'ID come chiave e l'oggetto {@link StationData stazione} come valore.
 	 */
 	public static Map<Integer, Station> getAllStations() {
@@ -89,16 +88,15 @@ public class StationsDAO {
 	}
 	
 	
-	// TODO Forse ridondante
 	/**
-	 * Dati sulle stazioni per la simulazione
+	 * Permette di ottenere i dati sulle stazioni necessari per eseguire la simulazione, vengono inizializzati i parametri relativi al numero di docks e bici.
+	 * @return La {@link Map mappa} con l'ID come chiave e l'oggetto {@link StationData stazione} come valore.
 	 */
 	public static Map<Integer, Station> getAllStationsSimulator() {
 		Map<Integer, Station> result = new HashMap<>();
-		// TODO Esclude tutte le stazioni con installed_date = null da pensarci
 		String sql = "SELECT * " +
 				"FROM stations " + 
-				//"WHERE installed = 1 AND installed_date < NOW() AND (removal_date IS NULL OR removal_date > NOW() + INTERVAL 1 MONTH) " +
+				"WHERE installed = 1 " + //AND installed_date < NOW() AND (removal_date IS NULL OR removal_date > NOW() + INTERVAL 1 MONTH) " + // TODO Esclude tutte le stazioni con installed_date = null da pensarci
 				"ORDER BY station_id";
 		
 		Connection conn = DBConnect.getConnection();
