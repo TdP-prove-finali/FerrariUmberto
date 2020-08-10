@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.polito.tdp.CompassBike.model.Rental;
+import it.polito.tdp.CompassBike.dataImport.Rental;
 import it.polito.tdp.CompassBike.model.Route;
 import it.polito.tdp.CompassBike.model.Station;
 
@@ -69,7 +69,7 @@ public class RentalsDAO { // TODO Tutta la documentazione
 			st.setDate(1, Date.valueOf(day));
 			st.setDate(2, Date.valueOf(day));
 			ResultSet res = st.executeQuery();
-			while (res.next()) {
+			if(res.next()) {
 				result = res.getInt("num");
 			}
 			conn.close();
@@ -194,7 +194,7 @@ public class RentalsDAO { // TODO Tutta la documentazione
 	 * Percentuale stazioni arrivo diviso per stazioni di partenza.
 	 * @return
 	 */
-	public static Map<Integer, Map<Integer, Double>> percentageEndStationsDay(LocalDate day) {
+	public static Map<Integer, Map<Integer, Double>> percentageEndStationsDay(LocalDate day, Map<Integer, Station> stationsIdMap) {
 		String sql = "SELECT start_station_id, end_station_id, COUNT(*)/(SUM(COUNT(*)) OVER (PARTITION BY start_station_id))*100 AS perc " + 
 				"FROM rentals " +
 				"WHERE DATE(end_date) = ? AND DATE(start_date) = ? " +
@@ -216,13 +216,17 @@ public class RentalsDAO { // TODO Tutta la documentazione
 				Double perc = res.getDouble("perc");
 				if(result.containsKey(startId)) {
 					Map<Integer, Double> temp = result.get(startId);
-					temp.put(endId, perc);
-					result.remove(startId);
-					result.put(startId, temp);
+					if(stationsIdMap.containsKey(endId)) {
+						temp.put(endId, perc);
+						result.remove(startId);
+						result.put(startId, temp);
+					}
 				} else {
-					Map<Integer, Double> temp = new HashMap<Integer, Double>();
-					temp.put(endId, perc);
-					result.put(startId, temp);
+					if(stationsIdMap.containsKey(endId)) {
+						Map<Integer, Double> temp = new HashMap<>();
+						temp.put(endId, perc);
+						result.put(startId, temp);
+					}
 				}
 			}
 			conn.close();

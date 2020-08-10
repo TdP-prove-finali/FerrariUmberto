@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike.model;
+package it.polito.tdp.CompassBike.dataImport;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

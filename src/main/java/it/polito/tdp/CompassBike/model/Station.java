@@ -1,149 +1,207 @@
 package it.polito.tdp.CompassBike.model;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Station {
 	
 	private Integer id;
 	private String commonName;
-	private Integer terminalName;
-	private boolean isInstalled;
-	private boolean isLocked;
-	private LocalDate installDate;
-	private LocalDate removalDate;
-	private boolean isTemporary;
+	
 	private Integer numBikes;
 	private Integer numEmptyDocks;
 	private Integer numDocks;
+	
+	private List<Bike> bikes;
+	
 	private Double latitude;
 	private Double longitude;
-	private boolean isBroken;
+	
+	private List<BikeRent> completedRent;
+	private List<BikeRent> canceledRent;
+	private List<BikeRent> emptyStationRent;
+	private List<BikeRent> fullStationRent;
 	
 	
-	public Station(Integer id, String commonName, Double latitude, Double longitude) {
+	public Station(Integer id, String commonName, Integer numBikes, Integer numEmptyDocks, Integer numDocks,
+			Double latitude, Double longitude) {
 		this.id = id;
 		this.commonName = commonName;
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-	
-
-	public Station(Integer id, String commonName, Integer terminalName, boolean isInstalled, boolean isLocked,
-			LocalDate installDate, LocalDate removalDate, boolean isTemporary, Integer numBikes, Integer numEmptyDocks,
-			Integer numDocks, Double latitude, Double longitude, boolean isBroken) {
-		this.id = id;
-		this.commonName = commonName;
-		this.terminalName = terminalName;
-		this.isInstalled = isInstalled;
-		this.isLocked = isLocked;
-		this.installDate = installDate;
-		this.removalDate = removalDate;
-		this.isTemporary = isTemporary;
 		this.numBikes = numBikes;
 		this.numEmptyDocks = numEmptyDocks;
 		this.numDocks = numDocks;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.isBroken = isBroken;
-	}
-
-
-	public Integer getTerminalName() {
-		return terminalName;
-	}
-
-	public void setTerminalName(Integer terminalName) {
-		this.terminalName = terminalName;
-	}
-
-	public boolean isInstalled() {
-		return isInstalled;
-	}
-
-	public void setInstalled(boolean isInstalled) {
-		this.isInstalled = isInstalled;
-	}
-
-	public boolean isLocked() {
-		return isLocked;
-	}
-
-	public void setLocked(boolean isLocked) {
-		this.isLocked = isLocked;
-	}
-
-	public LocalDate getInstallDate() {
-		return installDate;
-	}
-
-	public void setInstallDate(LocalDate installDate) {
-		this.installDate = installDate;
-	}
-
-	public LocalDate getRemovalDate() {
-		return removalDate;
-	}
-
-	public void setRemovalDate(LocalDate removalDate) {
-		this.removalDate = removalDate;
-	}
-
-	public boolean isTemporary() {
-		return isTemporary;
+		this.completedRent = new ArrayList<>();
+		this.canceledRent = new ArrayList<>();
 	}
 	
-	public void setTemporary(boolean isTemporary) {
-		this.isTemporary = isTemporary;
-	}
-
-	public Integer getNumBikes() {
-		return numBikes;
-	}
-
-	public void setNumBikes(Integer numBikes) {
-		this.numBikes = numBikes;
-	}
-
-	public Integer getNumEmptyDocks() {
-		return numEmptyDocks;
-	}
-
-	public void setNumEmptyDocks(Integer numEmpityDocks) {
-		this.numEmptyDocks = numEmpityDocks;
-	}
-
-	public Integer getNumDocks() {
-		return numDocks;
-	}
-
-	public void setNumDocks(Integer numDocks) {
-		this.numDocks = numDocks;
-	}
-
-	public boolean isBroken() {
-		return isBroken;
-	}
-
-	public void setBroken(boolean isBroken) {
-		this.isBroken = isBroken;
-	}
-
+	
 	public Integer getId() {
 		return id;
 	}
+
 
 	public String getCommonName() {
 		return commonName;
 	}
 
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
+	}
+
+
+	public Integer getNumBikes() {
+		return numBikes;
+	}
+
+
+	public void setNumBikes(Integer numBikes) {
+		this.numBikes = numBikes;
+	}
+
+
+	public Integer getNumEmptyDocks() {
+		return numEmptyDocks;
+	}
+
+
+	public void setNumEmptyDocks(Integer numEmptyDocks) {
+		this.numEmptyDocks = numEmptyDocks;
+	}
+
+
+	public Integer getNumDocks() {
+		return numDocks;
+	}
+
+
+	public void setNumDocks(Integer numDocks) {
+		this.numDocks = numDocks;
+	}
+
+
 	public Double getLatitude() {
 		return latitude;
 	}
 
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+
 	public Double getLongitude() {
 		return longitude;
 	}
+
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+
+	public List<BikeRent> getCompletedRent() {
+		return completedRent;
+	}
+
+
+	public void setCompletedRent(List<BikeRent> completedRent) {
+		this.completedRent = completedRent;
+	}
+
+
+	public List<BikeRent> getCanceledRent() {
+		return canceledRent;
+	}
+
+
+	public void setCanceledRent(List<BikeRent> canceledRent) {
+		this.canceledRent = canceledRent;
+	}
+
+
+	public void increaseNumBike(Integer increase) {
+		this.numBikes += increase;
+	}
 	
+	
+	public void decreaseNumBike(Integer decrease) {
+		this.numBikes -= decrease;
+	}
+	
+	
+	public void increaseNumEmpityDocks(Integer increase) {
+		this.numEmptyDocks += increase;
+	}
+	
+	
+	public void decreaseNumEmpityDocks(Integer decrease) {
+		this.numEmptyDocks -= decrease;
+	}
+	
+	
+	public void addCompletedRent(BikeRent rent) {
+		this.completedRent.add(rent);
+	}
+	
+	
+	public void addCanceledRent(BikeRent rent) {
+		this.canceledRent.add(rent);
+	}
+
+
+	public List<BikeRent> getEmptyStationRent() {
+		return emptyStationRent;
+	}
+
+
+	public void setEmptyStationRent(List<BikeRent> emptyStationRent) {
+		this.emptyStationRent = emptyStationRent;
+	}
+	
+	
+	public void addEmptyStationRent(BikeRent rent) {
+		this.emptyStationRent.add(rent);
+	}
+
+
+	public List<BikeRent> getFullStationRent() {
+		return fullStationRent;
+	}
+
+
+	public void setFullStationRent(List<BikeRent> fullStationRent) {
+		this.fullStationRent = fullStationRent;
+	}
+	
+	
+	public void addFullStationRent(BikeRent rent) {
+		this.fullStationRent.add(rent);
+	}
+
+
+	public List<Bike> getBikes() {
+		return bikes;
+	}
+
+
+	public void setBikes(List<Bike> bikes) {
+		this.bikes = bikes;
+	}
+	
+	
+	public void addBike(Bike bike) {
+		this.bikes.add(bike);
+	}
+	
+	
+	public void removeBike(Bike bike) {
+		this.bikes.remove(bike);
+	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -171,8 +229,10 @@ public class Station {
 	}
 
 
+	@Override
 	public String toString() {
-		return this.id+" - "+this.commonName;
+		// TODO Auto-generated method stub
+		return super.toString();
 	}
-
+	
 }

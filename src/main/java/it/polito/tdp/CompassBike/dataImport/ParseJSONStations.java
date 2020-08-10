@@ -1,4 +1,4 @@
-package it.polito.tdp.dataImport;
+package it.polito.tdp.CompassBike.dataImport;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,17 +14,15 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import it.polito.tdp.CompassBike.model.Station;
-
 public class ParseJSONStations {
 	
 	/**
 	 * Metodo di utilità per leggere un file JSON che contiene le informazioni sulle stazioni
 	 * @return ritorna la lista delle stazioni
 	 */
-	public static List<Station> parse(String directory) {
+	public static List<StationData> parse(String directory) {
 		Path path = Paths.get(directory);
-		List<Station> stations = new ArrayList<Station>();
+		List<StationData> stations = new ArrayList<StationData>();
  
 		JSONArray jsonArray = null;
 	    try {
@@ -49,7 +47,7 @@ public class ParseJSONStations {
 				Double latitude = jsonStation.getDouble("lat");
 				Double longitude = jsonStation.getDouble("lon");
 				
-				Station station = new Station(id, commonName, latitude, longitude);
+				StationData station = new StationData(id, commonName, latitude, longitude);
 				
 				JSONArray properties = jsonStation.getJSONArray("additionalProperties");
 				for(int j = 0; j < properties.length(); j++) {

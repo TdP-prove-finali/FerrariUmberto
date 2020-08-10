@@ -1,4 +1,4 @@
-package it.polito.tdp.dataImport;
+package it.polito.tdp.CompassBike.dataImport;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,8 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-
-import it.polito.tdp.CompassBike.model.Rental;
 
 public class ParseCSVRentals {
 

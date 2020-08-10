@@ -1,4 +1,4 @@
-package it.polito.tdp.dataImport;
+package it.polito.tdp.CompassBike.dataImport;
 
 public class TestDataImport {
 

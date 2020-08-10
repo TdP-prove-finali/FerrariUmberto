@@ -16,16 +16,17 @@ import it.polito.tdp.CompassBike.DAO.RentalsDAO;
 import it.polito.tdp.CompassBike.DAO.StationsDAO;
 import it.polito.tdp.CompassBike.model.Event.EventType;
 
-public class RentalsGenerator {
+public class EventsGenerator {
 	
 	// TODO Implementare la scelta del periodo di tempo e non solo il giorno
+	// TODO Da cambiare StationData con Station
 	
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Station, Double> percentageStartStations;
 	private Map<LocalDateTime, Double> percentageTime;
 	
-	private LocalDate day = LocalDate.now().minus(2, ChronoUnit.MONTHS).minus(12, ChronoUnit.DAYS);
+	private LocalDate day = LocalDate.now().minus(2, ChronoUnit.MONTHS).minus(14, ChronoUnit.DAYS);
 	
 	private Integer numRentals;
 	
@@ -103,6 +104,7 @@ public class RentalsGenerator {
 		this.percentageTime = RentalsDAO.percentageTimeDay(day);
 		
 		this.numRentals = RentalsDAO.getNumRentalsDay(day);
+		System.out.println("NumRentals "+this.numRentals);
 		
 		this.buildGraph();
 	}
@@ -114,11 +116,10 @@ public class RentalsGenerator {
 	private void buildGraph() {
 		this.graph = new DefaultDirectedWeightedGraph<Station, RouteEdge>(RouteEdge.class);
 		
-		Map<Integer, Station> stationsIdMap = StationsDAO.getAllStations();
-		Graphs.addAllVertices(this.graph, stationsIdMap.values());
+		Graphs.addAllVertices(this.graph, this.stationsIdMap.values());
 		
-		List<Route> route = RentalsDAO.getAllRouteDay(day, stationsIdMap);
-		Map<Integer, Map<Integer, Double>> percentageEndStations = RentalsDAO.percentageEndStationsDay(day);
+		List<Route> route = RentalsDAO.getAllRouteDay(day, this.stationsIdMap);
+		Map<Integer, Map<Integer, Double>> percentageEndStations = RentalsDAO.percentageEndStationsDay(day, this.stationsIdMap);
 		
 		for(Route r : route) {
 			if(this.graph.containsVertex(r.getStartStation()) && this.graph.containsVertex(r.getEndStation())) {

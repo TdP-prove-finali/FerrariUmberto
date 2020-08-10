@@ -1,6 +1,5 @@
 package it.polito.tdp.CompassBike.model;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Event implements Comparable<Event> {
@@ -14,15 +13,43 @@ public class Event implements Comparable<Event> {
 	private LocalDateTime time;
 	
 	private Station endStation;
-	private Duration duration;
 	
 	private Bike bike;
+	private BikeRent bikeRent;
 
 	
 	public Event(EventType type, Station startStation, LocalDateTime time) {
 		this.type = type;
 		this.startStation = startStation;
 		this.time = time;
+	}
+	
+	
+	public Event(EventType type, Station startStation, LocalDateTime time, BikeRent bikeRent) {
+		this.type = type;
+		this.startStation = startStation;
+		this.time = time;
+		this.bikeRent = bikeRent;
+	}
+	
+
+	public Event(EventType type, Station startStation, LocalDateTime time, Bike bike, BikeRent bikeRent) {
+		super();
+		this.type = type;
+		this.startStation = startStation;
+		this.time = time;
+		this.bike = bike;
+		this.bikeRent = bikeRent;
+	}
+	
+
+	public Event(EventType type, Station startStation, LocalDateTime time, Station endStation, Bike bike, BikeRent bikeRent) {
+		this.type = type;
+		this.startStation = startStation;
+		this.time = time;
+		this.endStation = endStation;
+		this.bike = bike;
+		this.bikeRent = bikeRent;
 	}
 
 
@@ -66,16 +93,6 @@ public class Event implements Comparable<Event> {
 	}
 
 
-	public Duration getDuration() {
-		return duration;
-	}
-
-
-	public void setDuration(Duration duration) {
-		this.duration = duration;
-	}
-
-
 	public Bike getBike() {
 		return bike;
 	}
@@ -86,9 +103,27 @@ public class Event implements Comparable<Event> {
 	}
 
 
+	public BikeRent getBikeRent() {
+		return bikeRent;
+	}
+
+
+	public void setBikeRent(BikeRent bikeRent) {
+		this.bikeRent = bikeRent;
+	}
+
+
 	@Override
 	public int compareTo(Event o) {
-		return this.time.compareTo(o.time);
+		if(this.time.equals(o.time)) {
+			if(this.type == EventType.PRELIEVO)
+				return -1;
+			else if(o.type == EventType.PRELIEVO)
+				return 1;
+			else 
+				return this.time.compareTo(o.time);
+		} else
+			return this.time.compareTo(o.time);
 	}
 	
 }

@@ -2,15 +2,26 @@ package it.polito.tdp.CompassBike.model;
 
 public class Bike {
 	
-	private Integer id;
-	private Integer stationId;
-	private boolean isBroken;
+	public enum BikeStatus {
+		STAZIONE, NOLEGGIATA, DA_DISTRIBUIRE
+	}
 	
-	public Bike(Integer id, Integer stationId, boolean isBroken) {
-		super();
+	private Integer id;
+	// Se stationId = null allora la bici è in noleggio oppure in distribuzione
+	private Station station;
+	private boolean isBroken;
+	private BikeStatus status;
+	
+	public Bike(Integer id, Station station, boolean isBroken, BikeStatus status) {
 		this.id = id;
-		this.stationId = stationId;
+		this.station = station;
 		this.isBroken = isBroken;
+		this.status = status;
+	}
+	
+	public Bike(Integer id, Station station) {
+		this.id = id;
+		this.station = station;
 	}
 
 	public Bike(Integer id) {
@@ -18,12 +29,12 @@ public class Bike {
 		this.id = id;
 	}
 
-	public Integer getStationId() {
-		return stationId;
+	public Station getStation() {
+		return station;
 	}
 
-	public void setStationId(Integer stationId) {
-		this.stationId = stationId;
+	public void setStation(Station station) {
+		this.station = station;
 	}
 
 	public boolean isBroken() {
@@ -38,6 +49,14 @@ public class Bike {
 		return id;
 	}
 	
+	public BikeStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BikeStatus status) {
+		this.status = status;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -65,7 +84,7 @@ public class Bike {
 	
 
 	public String toString() {
-		return this.id+" "+this.stationId;
+		return this.id+" "+this.station.getId();
 	}
 
 }
