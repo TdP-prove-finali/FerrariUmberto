@@ -89,7 +89,7 @@ public class StationsDAO {
 	}
 	
 	
-	// TODO Forse ridondate
+	// TODO Forse ridondante
 	/**
 	 * Dati sulle stazioni per la simulazione
 	 */
@@ -98,7 +98,7 @@ public class StationsDAO {
 		// TODO Esclude tutte le stazioni con installed_date = null da pensarci
 		String sql = "SELECT * " +
 				"FROM stations " + 
-				"WHERE installed = 1 AND installed_date < NOW() AND (removal_date IS NULL OR removal_date > NOW() + INTERVAL 1 MONTH) " +
+				//"WHERE installed = 1 AND installed_date < NOW() AND (removal_date IS NULL OR removal_date > NOW() + INTERVAL 1 MONTH) " +
 				"ORDER BY station_id";
 		
 		Connection conn = DBConnect.getConnection();

@@ -19,7 +19,7 @@ public class ParseCSVRentals {
         try {
         	BufferedReader br = new BufferedReader(new FileReader(directory));
         	br.readLine(); //Leggo la prima riga con le intestazioni
-        	
+
             while ((line = br.readLine()) != null) {
             	
             	List<String> values = new ArrayList<String>();
@@ -40,8 +40,7 @@ public class ParseCSVRentals {
                 
                 // TODO Fare controllo errore per la lettura di questi parametri
                 Integer id = Integer.parseInt(values.get(0));
-                // TODO Non funziona nel modo giusto il passaggio del parametro Duration
-                Duration duration = Duration.of(Integer.parseInt(values.get(1)), ChronoUnit.MINUTES);
+                Duration duration = Duration.of(Integer.parseInt(values.get(1)), ChronoUnit.SECONDS);
                 Integer bikeId = Integer.parseInt(values.get(2));
                 LocalDateTime endDate = LocalDateTime.parse(values.get(3),formatter);
                 Integer endStationId = Integer.parseInt(values.get(4));

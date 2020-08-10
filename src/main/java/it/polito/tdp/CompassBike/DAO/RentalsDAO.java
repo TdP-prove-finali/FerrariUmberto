@@ -36,7 +36,7 @@ public class RentalsDAO { // TODO Tutta la documentazione
 			
 			st.setInt(1, rental.getId());
 			st.setInt(8, rental.getId());
-			st.setLong(2, rental.getDuration().toMillis());
+			st.setInt(2, (int) rental.getDuration().toSeconds());
 			st.setInt(3, rental.getBikeId());
 			st.setTimestamp(4, Timestamp.valueOf(rental.getEndDate()));
 			st.setInt(5, rental.getEndStationId());
@@ -156,7 +156,7 @@ public class RentalsDAO { // TODO Tutta la documentazione
 	 * @return
 	 */
 	public static List<Route> getAllRouteDay(LocalDate day, Map<Integer, Station> stationsIdMap) {
-		String sql = "SELECT start_station_id, end_station_id, MIN(duration) AS min, MAX(DURATION) AS max " + 
+		String sql = "SELECT start_station_id, end_station_id, MIN(duration) AS min, MAX(duration) AS max " + 
 				"FROM rentals " + 
 				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " + 
 				"GROUP BY start_station_id, end_station_id " + 
@@ -175,8 +175,7 @@ public class RentalsDAO { // TODO Tutta la documentazione
 				Integer endId = res.getInt("end_station_id");
 				
 				if(stationsIdMap.containsKey(startId) && stationsIdMap.containsKey(endId)) {
-					// TODO Capire l'uso di Duration con il DB, se passare/leggere Long è corretto
-					Route route = new Route(stationsIdMap.get(startId), stationsIdMap.get(endId), Duration.of(res.getLong("min"), ChronoUnit.MINUTES), Duration.of(res.getLong("max"), ChronoUnit.MINUTES));
+					Route route = new Route(stationsIdMap.get(startId), stationsIdMap.get(endId), Duration.of(res.getLong("min"), ChronoUnit.SECONDS), Duration.of(res.getLong("max"), ChronoUnit.SECONDS));
 					result.add(route);
 				}
 			}

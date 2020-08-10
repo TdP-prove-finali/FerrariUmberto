@@ -1,20 +1,26 @@
 package it.polito.tdp.CompassBike.model;
 
-import java.util.List;
+import java.util.Map;
 
 public class TestModel {
 
 	public static void main(String[] args) {
 		Long inizio = System.currentTimeMillis();
 		
-		EventsGenerator rg = new EventsGenerator();
-		rg.setVariation(-10.0);
-		rg.loadParameters();
-		List<Event> events = rg.generateEvents();
-		System.out.println("Events size "+events.size());
-		
 		Simulator sim = new Simulator();
 		sim.init();
+		sim.run();
+		
+		Map<Integer, Station> res = sim.getStations();
+		for(Integer id : res.keySet()) {
+			Station st = res.get(id);
+			System.out.println(st.getCommonName()+" "+st.getCompletedRent().size()+" "+st.getCanceledRent().size()+" "+st.getEmptyStationRent().size()+" "+st.getFullStationRent().size());
+		}
+		
+		System.out.println("\n\n");
+		System.out.println("COMPLETATI "+sim.getNumCompletedRent());
+		System.out.println("CANCELLATI "+sim.getNumCanceledRent());
+		System.out.println("NUM RENT "+sim.getNumRent());
 		
 		Long fine = System.currentTimeMillis();
 		Long durata = fine - inizio;

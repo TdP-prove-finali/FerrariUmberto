@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Random;
 
@@ -26,7 +25,8 @@ public class EventsGenerator {
 	private Map<Station, Double> percentageStartStations;
 	private Map<LocalDateTime, Double> percentageTime;
 	
-	private LocalDate day = LocalDate.now().minus(2, ChronoUnit.MONTHS).minus(14, ChronoUnit.DAYS);
+	//private LocalDate day = LocalDate.now().minus(2, ChronoUnit.MONTHS).minus(18, ChronoUnit.DAYS);
+	private LocalDate day = LocalDate.of(2020, 5, 20);
 	
 	private Integer numRentals;
 	
@@ -62,9 +62,8 @@ public class EventsGenerator {
 			Station randomStation = null;
 			
 			for(Station station : this.percentageStartStations.keySet()) {
-				if(cumulative < percentage)
-					cumulative += this.percentageStartStations.get(station);
-				else {
+				cumulative += this.percentageStartStations.get(station);	
+				if(cumulative > percentage) {
 					randomStation = station;
 					break;
 				}
@@ -75,9 +74,8 @@ public class EventsGenerator {
 			LocalDateTime randomTime = null;
 			
 			for(LocalDateTime time : this.percentageTime.keySet()) {
-				if(cumulative < percentage)
-					cumulative += this.percentageTime.get(time);
-				else {
+				cumulative += this.percentageTime.get(time);
+				if(cumulative > percentage) {
 					randomTime = time;
 					break;
 				}
@@ -98,13 +96,13 @@ public class EventsGenerator {
 	 * Carica tutti i parametri necessari a generare casualmente i noleggi necessari alla {@link Simulator simulazione}.
 	 */
 	public void loadParameters() {
-		this.stationsIdMap = StationsDAO.getAllStations();
+		this.stationsIdMap = StationsDAO.getAllStationsSimulator();
 		
-		this.percentageStartStations = RentalsDAO.percentageStartStationsDay(day, stationsIdMap);
+		this.percentageStartStations = RentalsDAO.percentageStartStationsDay(day, this.stationsIdMap);
 		this.percentageTime = RentalsDAO.percentageTimeDay(day);
 		
 		this.numRentals = RentalsDAO.getNumRentalsDay(day);
-		System.out.println("NumRentals "+this.numRentals);
+		//System.out.println("Num rentals DB "+this.numRentals);
 		
 		this.buildGraph();
 	}
@@ -123,6 +121,9 @@ public class EventsGenerator {
 		
 		for(Route r : route) {
 			if(this.graph.containsVertex(r.getStartStation()) && this.graph.containsVertex(r.getEndStation())) {
+				r.getStartStation().getId();
+				r.getEndStation().getId();
+				percentageEndStations.get(r.getStartStation().getId()).get(r.getEndStation().getId());
 				RouteEdge edge = new RouteEdge(r.getMinDuration(), r.getMaxDuration());
 				this.graph.addEdge(r.getStartStation(), r.getEndStation(), edge);
 				this.graph.setEdgeWeight(edge, percentageEndStations.get(r.getStartStation().getId()).get(r.getEndStation().getId()));
@@ -137,6 +138,12 @@ public class EventsGenerator {
 	 */
 	public Graph<Station, RouteEdge> getGraph() {
 		return this.graph;
+	}
+	
+	
+	// TODO Da passare non da qui ma dal model
+	public Map<Integer, Station> getStationsGen() {
+		return this.stationsIdMap;
 	}
 	
 	

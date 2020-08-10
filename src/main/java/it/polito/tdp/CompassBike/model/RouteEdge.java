@@ -14,7 +14,6 @@ public class RouteEdge extends DefaultWeightedEdge {
 	private Duration maxDuration;
 	
 	public RouteEdge(Duration minDuration, Duration maxDuration) {
-		super();
 		this.minDuration = minDuration;
 		this.maxDuration = maxDuration;
 	}

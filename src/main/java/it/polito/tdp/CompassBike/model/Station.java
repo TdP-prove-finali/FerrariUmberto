@@ -32,8 +32,11 @@ public class Station {
 		this.numDocks = numDocks;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.bikes = new ArrayList<>();
 		this.completedRent = new ArrayList<>();
 		this.canceledRent = new ArrayList<>();
+		this.emptyStationRent = new ArrayList<>();
+		this.fullStationRent = new ArrayList<>();
 	}
 	
 	
@@ -226,13 +229,6 @@ public class Station {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}
-
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
 	}
 	
 }

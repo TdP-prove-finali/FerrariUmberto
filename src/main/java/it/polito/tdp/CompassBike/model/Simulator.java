@@ -1,6 +1,7 @@
 package it.polito.tdp.CompassBike.model;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,7 +15,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
 import it.polito.tdp.CompassBike.DAO.BikesDAO;
-import it.polito.tdp.CompassBike.DAO.StationsDAO;
 import it.polito.tdp.CompassBike.model.Bike.BikeStatus;
 import it.polito.tdp.CompassBike.model.BikeRent.BikeRentStatus;
 import it.polito.tdp.CompassBike.model.Event.EventType;
@@ -51,22 +51,22 @@ public class Simulator {
 	 */
 	public void init() { // TODO Passare periodo di tempo
 		this.generator = new EventsGenerator();
-		this.generator.loadParameters(); // TODO Forse è meglio spostare questi due comandi nel model
+		this.generator.setVariation(-10.0);
+		this.generator.loadParameters(); // TODO Forse è meglio spostare questi tre comandi nel model e passare il Generator
 		
 		this.queue = new PriorityQueue<>();
 		this.queue.addAll(this.generator.generateEvents());
 		
 		this.graph = this.generator.getGraph();
-		System.out.println("Vertici: "+this.graph.vertexSet().size()+"\nArchi: "+this.graph.edgeSet().size());
+		//System.out.println("Vertici: "+this.graph.vertexSet().size()+"\nArchi: "+this.graph.edgeSet().size());
 		
-		this.stations = StationsDAO.getAllStationsSimulator();
+		this.stations = this.generator.getStationsGen();
 		
 		this.bikes = BikesDAO.getAllBikesSimulator();
 		this.initBike();
 		
 		this.completedRentals = new ArrayList<>();
 		this.canceledRentals = new ArrayList<>();
-		// TODO Clonare rent per aggiungerli alle due liste sotto
 		this.emptyStationRent = new ArrayList<>();
 		this.fullStationRent = new ArrayList<>();
 		this.numRent = 0;
@@ -89,21 +89,21 @@ public class Simulator {
 		Integer distribuited = 0;
 		
 		Double percentage = ((double) numBikes) / ((double) numDocks);
-		System.out.println("Percentuale "+percentage);
 		
 		for(Integer id : this.stations.keySet()) {
 			Station st = this.stations.get(id);
 			Integer num = (int) (st.getNumDocks() * percentage);
-			st.setNumEmptyDocks(st.getNumEmptyDocks() - num);
 			
 			for(int i = distribuited; i < distribuited + num && i < numBikes; i++) {
 				Bike bk = listBikes.get(i);
 				bk.setStatus(BikeStatus.STAZIONE);
 				bk.setStation(st);
+				st.addBike(bk);
 			}
 			
 			distribuited += num;
-			st.setNumBikes(st.getNumBikes() + num);
+			st.decreaseNumEmpityDocks(num);
+			st.increaseNumBike(num);
 		}
 		
 		if(distribuited < numBikes) {
@@ -115,14 +115,22 @@ public class Simulator {
 			
 			do {
 				for(Station st : stationsSort) {
-					st.setNumBikes(st.getNumBikes() + 1);
-					st.setNumEmptyDocks(st.getNumEmptyDocks() - 1);
-					distribuited++;
+					st.increaseNumBike(1);
+					st.decreaseNumEmpityDocks(1);
+					
+					Bike bk = listBikes.get(distribuited++);
+					bk.setStatus(BikeStatus.STAZIONE);
+					bk.setStation(st);
+					
+					st.addBike(bk);
+					
 					if(distribuited >= numBikes)
 						break;
 				}
 			} while(distribuited < numBikes);
 		}
+
+		//System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
 	}
 	
 	
@@ -137,68 +145,47 @@ public class Simulator {
 	}
 
 
+	/**
+	 * Processa il singolo evento.
+	 */
 	private void processEvent(Event e) {
-		// TODO Variabili stesso nome
-		// TODO Aggiornare la capienza delle stazioni
 		Station startStation = e.getStartStation();
-		Station endStation = e.getEndStation(); // NON sono sicuro di questo
+		Station endStation = e.getEndStation();
 		BikeRent bikeRent = e.getBikeRent();
-		Bike bike = e.getBike();
 		
 		switch(e.getType()) {
 		case NOLEGGIO:
-			// Nuovo noleggio con stato IN_CORSO
 			if(startStation.getNumBikes() > 0) {
-				bikeRent = new BikeRent(this.numRent++, BikeRentStatus.IN_CORSO, startStation, e.getTime());
+				if(bikeRent == null)
+					bikeRent = new BikeRent(this.numRent++, BikeRentStatus.IN_CORSO, startStation, e.getTime());
 				this.queue.add(new Event(EventType.PRELIEVO, startStation, e.getTime(), bikeRent));
 			} else {
-				bikeRent = new BikeRent(this.numRent++, BikeRentStatus.CAMBIO_STAZIONE, startStation, e.getTime());
+				if(bikeRent == null)
+					bikeRent = new BikeRent(this.numRent++, BikeRentStatus.CAMBIO_STAZIONE, startStation, e.getTime());
 				this.queue.add(new Event(EventType.STAZIONE_VUOTA, startStation, e.getTime(), bikeRent));
 			}
 			break;
 			
 		case PRELIEVO:
-			// Scelgo la bici
-			Random r = new Random();
+			Bike randomBike = this.getRandomBike(startStation);
 			
-			bike = startStation.getBikes().get(r.nextInt(startStation.getBikes().size()));
-			bike.setStatus(BikeStatus.NOLEGGIATA);
-			bike.setStation(null);
+			Station randomEndStation = this.getRandomEndStation(startStation);
 			
-			startStation.removeBike(e.getBike());
-			startStation.decreaseNumBike(1);
-			startStation.increaseNumEmpityDocks(1);
-			
-			// Scelta della stazione di arrivo
-			r = new Random();
-			Double percentage = r.nextDouble() * 100.0;
-			Double cumulative = 0.0;
-			for(Station end : Graphs.successorListOf(this.graph, startStation)) {
-				if(cumulative < percentage)
-					cumulative += this.graph.getEdgeWeight(this.graph.getEdge(startStation, end));
-				else {
-					endStation = end;
-					break;
-				}
-			}
-			
-			// Scelta della durata
-			r = new Random();
-			Long rangeMin = this.graph.getEdge(startStation, endStation).getMinDuration().toMinutes();
-			Long rangeMax = this.graph.getEdge(startStation, endStation).getMaxDuration().toMinutes();
-			Long randomMinutes = (long) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
-			Duration randomDuration = Duration.of(randomMinutes, ChronoUnit.MINUTES);
+			Duration randomDuration = this.getRandomDuration(startStation, randomEndStation);
 			
 			// Aggiorno i dati del noleggio
-			bikeRent.setEndStation(endStation);
+			LocalDateTime endTime = e.getTime().plus(randomDuration);
+			bikeRent.setEndStation(randomEndStation);
 			bikeRent.setDuration(randomDuration);
-			bikeRent.setEndDateTime(e.getTime().plus(randomDuration));
+			bikeRent.setEndDateTime(endTime);
 			
-			this.queue.add(new Event(EventType.RILASCIO, startStation, bikeRent.getEndDateTime(), endStation, e.getBike(), bikeRent));
+			this.queue.add(new Event(EventType.RILASCIO, startStation, endTime, randomEndStation, randomBike, bikeRent));
 			break;
 			
 		case RILASCIO:
 			if(endStation.getNumEmptyDocks() > 0) {
+				// Riconsegna della bici
+				Bike bike = e.getBike();
 				bike.setStation(endStation);
 				bike.setStatus(BikeStatus.STAZIONE);
 				
@@ -209,7 +196,10 @@ public class Simulator {
 				bikeRent.setStatus(BikeRentStatus.COMPLETATO);
 				
 				this.completedRentals.add(bikeRent);
+				startStation.addCompletedRent(bikeRent);
+				endStation.addCompletedRent(bikeRent);
 			} else {
+				//Stazione piena
 				bikeRent.setStatus(BikeRentStatus.CAMBIO_STAZIONE);
 				this.queue.add(new Event(EventType.STAZIONE_PIENA, startStation, e.getTime(), endStation, e.getBike(), bikeRent));
 			}
@@ -217,63 +207,45 @@ public class Simulator {
 			
 		case STAZIONE_PIENA:
 			// TODO Se voglio implementare una casualità per cui l'utente abbandoni la bici nel caso di stazione piena
-			// Aggiorno dati del noleggio
+			
+			// Salvo l'informazione che c'è stato un problema dovuto alla stazione piena
 			BikeRent cloneFull = bikeRent.clone();
 			cloneFull.setStatus(BikeRentStatus.STAZIONE_PIENA);
 			endStation.addFullStationRent(cloneFull);
 			this.fullStationRent.add(cloneFull);
 			
-			Station newEndStation = null;
-			Duration minDuration = null;
-			for(Station end : Graphs.successorListOf(this.graph, endStation)) {
-				if(end.getNumEmptyDocks() > 0) {
-					RouteEdge edge = this.graph.getEdge(endStation, end);
-					if(minDuration == null) {
-						minDuration = edge.getMinDuration();
-						newEndStation = end;
-					}
-					else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
-						minDuration = edge.getMinDuration();
-						newEndStation = end;
-					}
-				}
-			}
+			Station newEndStation = this.getNearestEmptyStation(endStation);
+			
+			Duration durationToNewEndStation = this.graph.getEdge(endStation, newEndStation).getMinDuration();
+			
+			LocalDateTime newEndTime = e.getTime().plus(durationToNewEndStation);
 			bikeRent.setEndStation(newEndStation);
-			bikeRent.setEndDateTime(e.getTime().plus(minDuration));
+			bikeRent.setEndDateTime(newEndTime);
 			bikeRent.setStatus(BikeRentStatus.IN_CORSO);
 			
-			this.queue.add(new Event(EventType.RILASCIO, startStation, bikeRent.getEndDateTime(), newEndStation, bike, bikeRent));
+			this.queue.add(new Event(EventType.RILASCIO, startStation, newEndTime, newEndStation, e.getBike(), bikeRent));
 			break;
 			
 		case STAZIONE_VUOTA:
+			// Salvo l'informazione che c'è stato un problema dovuto alla stazione vuota
 			BikeRent cloneEmpty = bikeRent.clone();
 			cloneEmpty.setStatus(BikeRentStatus.STAZIONE_VUOTA);
 			startStation.addEmptyStationRent(cloneEmpty);
 			this.emptyStationRent.add(cloneEmpty);
 			
-			r = new Random();
+			Random r = new Random();
 			if(this.probabilityNewStation < r.nextDouble()) {
-				Station newStartStation = null;
-				minDuration = null;
-				for(Station start : Graphs.successorListOf(this.graph, startStation)) {
-					if(start.getNumBikes() > 0) {
-						RouteEdge edge = this.graph.getEdge(startStation, start);
-						if(minDuration == null) {
-							minDuration = edge.getMinDuration();
-							newStartStation = start;
-						}
-						else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
-							minDuration = edge.getMinDuration();
-							newStartStation = start;
-						}
-					}
-				}
+				// Nuova stazione per prelevare la bici
+				Station newStartStation = this.getNearestFullStation(startStation);
+				Duration durationToNewStartStation = this.graph.getEdge(startStation, newStartStation).getMinDuration();
+				
+				LocalDateTime newStartTime = e.getTime().plus(durationToNewStartStation);
 				
 				bikeRent.setStartStation(newStartStation);
-				bikeRent.setStartDateTime(e.getTime().plus(minDuration));
+				bikeRent.setStartDateTime(newStartTime);
 				bikeRent.setStatus(BikeRentStatus.IN_CORSO);
 				
-				this.queue.add(new Event(EventType.NOLEGGIO, newStartStation, bikeRent.getStartDateTime(), bikeRent));
+				this.queue.add(new Event(EventType.NOLEGGIO, newStartStation, newStartTime, bikeRent));
 				
 			} else {
 				// Annullamento noleggio
@@ -284,6 +256,142 @@ public class Simulator {
 			break;
 		}
 	}
+
+
+	/**
+	 * Sceglie casualmente una stazione di arrivo.
+	 * @param station {@link Station Stazione} di partenza
+	 * @return La {@link Station stazione} di arrivo scelta
+	 */
+	private Station getRandomEndStation(Station startStation) {
+		Random r = new Random();
+		Station result = null;
+		
+		Double percentage = r.nextDouble() * 100.0;
+		Double cumulative = 0.0;
+		
+		for(Station endStation : Graphs.successorListOf(this.graph, startStation)) {
+			cumulative += this.graph.getEdgeWeight(this.graph.getEdge(startStation, endStation));
+			if(cumulative > percentage) {
+				result = endStation;
+				break;
+			}
+		}
+
+		return result;
+	}
 	
+	
+	/**
+	 * Restituisce una durata casuale per il noleggio, questa durata deve essere compresa tra la durata massima e minima di tutti i noleggi tra le due stazioni.
+	 * @param startStation {@link Station Stazione} di partenza
+	 * @param endStation {@link Station Stazione} di arrivo
+	 * @return La {@link Duration durata} casuale
+	 */
+	private Duration getRandomDuration(Station startStation, Station endStation) { // TODO Da fare meglio, si potrebbe fare con una probabilità per ogni Duration ma viene complesso
+		Random r = new Random();
+		
+		Long rangeMin = this.graph.getEdge(startStation, endStation).getMinDuration().toMinutes();
+		Long rangeMax = this.graph.getEdge(startStation, endStation).getMaxDuration().toMinutes();
+		Long randomMinutes = (long) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
+		
+		Duration result = Duration.of(randomMinutes, ChronoUnit.MINUTES);
+		
+		return result;
+	}
+
+
+	/**
+	 * Sceglie casualmente una bicicletta presente nella stazione passata come parametro e la rimuove dalla stazione.
+	 * @param station {@link Station Stazione} da cui prelevare la bici
+	 * @return La {@link Bike bici} scelta
+	 */
+	private Bike getRandomBike(Station station) {
+		Random r = new Random();
+		
+		Bike bike = station.getBikes().get(r.nextInt(station.getBikes().size()));
+		bike.setStatus(BikeStatus.NOLEGGIATA);
+		bike.setStation(null);
+		
+		station.removeBike(bike);
+		station.decreaseNumBike(1);
+		station.increaseNumEmpityDocks(1);
+		
+		return bike;
+	}
+	
+	
+	/**
+	 * Restituisce la stazione più vicina a quella passata come parametro con almeno una dock libera.
+	 * @param station {@link Station Stazione} in cui si trova l'utente
+	 * @return La {@link Station stazione} più vicina con almeno un posto libero
+	 */
+	private Station getNearestEmptyStation(Station station) {
+		Station result = null;
+		Duration minDuration = null;
+		
+		for(Station near : Graphs.successorListOf(this.graph, station)) {
+			if(near.getNumEmptyDocks() > 0) {
+				RouteEdge edge = this.graph.getEdge(station, near);
+				
+				if(minDuration == null) {
+					minDuration = edge.getMinDuration();
+					result = near;
+				}
+				else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
+					minDuration = edge.getMinDuration();
+					result = near;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Restituisce la stazione più vicina a quella passata come parametro con almeno una bici disponibile.
+	 * @param station {@link Station Stazione} in cui si trova l'utente
+	 * @return La {@link Station stazione} più vicina con almeno una bici disponibile
+	 */
+	private Station getNearestFullStation(Station station) {
+		Station result = null;
+		Duration minDuration = null;
+		
+		Integer conta = 0;
+		for(Station near : Graphs.successorListOf(this.graph, station)) {
+			if(near.getNumBikes() > 0) {
+				conta++;
+				RouteEdge edge = this.graph.getEdge(station, near);
+				if(minDuration == null) {
+					minDuration = edge.getMinDuration();
+					result = near;
+				}
+				else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
+					minDuration = edge.getMinDuration();
+					result = near;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	public Map<Integer, Station> getStations() {
+		return this.stations;
+	}
+	
+	public Integer getNumCompletedRent() {
+		return this.completedRentals.size();
+	}
+	
+	public Integer getNumCanceledRent() {
+		return this.canceledRentals.size();
+	}
+	
+	public Integer getNumRent() {
+		return this.numRent;
+	}
 
 }
