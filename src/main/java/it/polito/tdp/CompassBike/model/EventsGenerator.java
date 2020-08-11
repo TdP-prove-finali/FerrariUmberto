@@ -17,15 +17,13 @@ import it.polito.tdp.CompassBike.model.Event.EventType;
 
 public class EventsGenerator {
 	
-	// TODO Implementare la scelta del periodo di tempo e non solo il giorno
-	
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Station, Double> percentageStartStations;
 	private Map<LocalDateTime, Double> percentageTime;
 	
-	private LocalDate startDate = LocalDate.of(2020, 5, 20);
-	private LocalDate endDate = LocalDate.of(2020, 05, 26);
+	private LocalDate startDate;
+	private LocalDate endDate;
 	
 	private Integer numRentals;
 	
@@ -39,10 +37,11 @@ public class EventsGenerator {
 	
 	
 	/**
-	 * Genera gli eventi.
-	 * @return
+	 * Genera gli {@link Event eventi} sulla base dei parametri caricati.
+	 * @return La {@link List lista} degli eventi generati
 	 */
 	public List<Event> generateEvents() {
+		Long inizio = System.currentTimeMillis();
 		List<Event> result = new ArrayList<>();
 		
 		Random r = new Random();
@@ -62,8 +61,8 @@ public class EventsGenerator {
 			
 			for(Station station : this.percentageStartStations.keySet()) {
 				cumulative += this.percentageStartStations.get(station);	
+				randomStation = station;
 				if(cumulative > percentage) {
-					randomStation = station;
 					break;
 				}
 			}
@@ -74,8 +73,8 @@ public class EventsGenerator {
 			
 			for(LocalDateTime time : this.percentageTime.keySet()) {
 				cumulative += this.percentageTime.get(time);
+				randomTime = time;
 				if(cumulative > percentage) {
-					randomTime = time;
 					break;
 				}
 			}
@@ -87,14 +86,22 @@ public class EventsGenerator {
 				i--;
 		}
 		
+		Long fine = System.currentTimeMillis();
+		Long durata = fine - inizio;
+		System.out.println("TEMPO GENERAZIONE "+durata / 1000.0+"\n");
 		return result;
 	}
 	
 	
 	/**
 	 * Carica tutti i parametri necessari a generare casualmente i noleggi necessari alla {@link Simulator simulazione}.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
 	 */
-	public void loadParameters() {
+	public void loadParameters(LocalDate startDate, LocalDate endDate) {
+		this.startDate = startDate;
+		this.endDate = endDate;
+		
 		this.stationsIdMap = StationsDAO.getAllStationsSimulator();
 		
 		this.percentageStartStations = RentalsDAO.percentageStartStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
@@ -131,10 +138,6 @@ public class EventsGenerator {
 	}
 	
 	
-	/**
-	 * Restituisce il grafo.
-	 * @return
-	 */
 	public Graph<Station, RouteEdge> getGraph() {
 		return this.graph;
 	}

@@ -112,7 +112,7 @@ public class StationsDAO {
 		Map<Integer, Station> result = new HashMap<>();
 		String sql = "SELECT * " +
 				"FROM stations " + 
-				"WHERE installed = 1 " + //AND installed_date < NOW() AND (removal_date IS NULL OR removal_date > NOW() + INTERVAL 1 MONTH) " + // TODO Esclude tutte le stazioni con installed_date = null da pensarci
+				"WHERE installed = 1 " + 
 				"ORDER BY station_id";
 		
 		Connection conn = DBConnect.getConnection();

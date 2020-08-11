@@ -20,14 +20,12 @@ import it.polito.tdp.CompassBike.model.Route;
 import it.polito.tdp.CompassBike.model.Station;
 
 public class RentalsDAO {
-	
-	// TODO Considerare tutte le restrizioni sul singolo giorno se corrette o da fare sul periodo
 
 	/**
 	 * Permette di aggiungere nuovi noleggi al db.
 	 * @param rentals {@link List lista} di {@link Rental noleggi} da aggiungere
 	 */
-	public static void addRental(List<Rental> rentals) { // TODO Aggiungere più noleggi con una sola connessione
+	public static void addRental(List<Rental> rentals) {
 		String sql = "INSERT INTO rentals VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rental_id = ?";
 		Connection conn = DBConnect.getConnection();
 		

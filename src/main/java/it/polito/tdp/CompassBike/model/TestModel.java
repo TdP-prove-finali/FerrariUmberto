@@ -1,14 +1,18 @@
 package it.polito.tdp.CompassBike.model;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public class TestModel {
 
 	public static void main(String[] args) {
+		LocalDate startDate = LocalDate.of(2020, 5, 20);
+		LocalDate endDate = LocalDate.of(2020, 05, 26);
+		
 		Long inizio = System.currentTimeMillis();
 		
 		Simulator sim = new Simulator();
-		sim.init();
+		sim.init(startDate, endDate, -10.0);
 		Long m = System.currentTimeMillis();
 		Long d = m - inizio;
 		System.out.println(d / 1000.0+"\n");

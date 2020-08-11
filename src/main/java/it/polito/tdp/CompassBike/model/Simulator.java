@@ -1,6 +1,7 @@
 package it.polito.tdp.CompassBike.model;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -21,22 +22,23 @@ import it.polito.tdp.CompassBike.model.Event.EventType;
 
 public class Simulator {
 	
-	// TODO Algoritmo per redistribuzione delle bici durante la giornata
-	
 	// Coda degli eventi
 	private Queue<Event> queue;
 	
 	// Parametri di simulazione
 	private EventsGenerator generator;
 	
-	private final Double probabilityNewStation = 0.60; // TODO La faccio variare?
+	// Probabilità che l'utente si rechi alla stazione più vicina nel caso in cui quella in cui si trova sia piena
+	private Double probabilityNewStartStation = 0.60;
+	
+	private LocalDate startDate;
+	private LocalDate endDate;
 	
 	// Modello del mondo
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Integer, Station> stations;
 	private Map<Integer, Bike> bikes;
-	
 	
 	// Valori da calcolare
 	private List<BikeRent> completedRentals;
@@ -48,11 +50,17 @@ public class Simulator {
 	
 	/**
 	 * Inizializza i parametri di simulazione.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @param variation Variazione percentuale sul numero di noleggi da generare nel periodo di tempo
 	 */
-	public void init() { // TODO Passare periodo di tempo
+	public void init(LocalDate startDate, LocalDate endDate, Double variation) { 
+		this.startDate = startDate;
+		this.endDate = endDate;
+		
 		this.generator = new EventsGenerator();
-		this.generator.setVariation(-10.0);
-		this.generator.loadParameters(); // TODO Forse è meglio spostare questi tre comandi nel model e passare il Generator
+		this.generator.setVariation(variation);
+		this.generator.loadParameters(this.startDate, this.endDate);
 		
 		this.queue = new PriorityQueue<>();
 		this.queue.addAll(this.generator.generateEvents());
@@ -206,8 +214,6 @@ public class Simulator {
 			break;
 			
 		case STAZIONE_PIENA:
-			// TODO Se voglio implementare una casualità per cui l'utente abbandoni la bici nel caso di stazione piena
-			
 			// Salvo l'informazione che c'è stato un problema dovuto alla stazione piena
 			BikeRent cloneFull = bikeRent.clone();
 			cloneFull.setStatus(BikeRentStatus.STAZIONE_PIENA);
@@ -234,7 +240,7 @@ public class Simulator {
 			this.emptyStationRent.add(cloneEmpty);
 			
 			Random r = new Random();
-			if(this.probabilityNewStation < r.nextDouble()) {
+			if(this.probabilityNewStartStation < r.nextDouble()) {
 				// Nuova stazione per prelevare la bici
 				Station newStartStation = this.getNearestFullStation(startStation);
 				Duration durationToNewStartStation = this.graph.getEdge(startStation, newStartStation).getMinDuration();
@@ -376,6 +382,15 @@ public class Simulator {
 		}
 		
 		return result;
+	}
+	
+	
+	/**
+	 * Permette di inserire la probabilità per cui un utente cerchi una nuova stazioni da cui noleggiare una bici nel caso in cui quella in cui si trova risulti vuota.
+	 * @param probability La probabilità scelta
+	 */
+	public void setProbabilityNewStartStation(Double probability) {
+		this.probabilityNewStartStation = probability / 100.0;
 	}
 	
 	
