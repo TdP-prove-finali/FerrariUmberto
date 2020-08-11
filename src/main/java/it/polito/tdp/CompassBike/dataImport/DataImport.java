@@ -14,8 +14,7 @@ public class DataImport {
 	public void parseJSONStations(String directory) {
 		// TODO Controllo errore impossibile leggere file
 		List<StationData> stations = ParseJSONStations.parse(directory);
-		for(StationData station : stations)
-			StationsDAO.addStation(station);
+		StationsDAO.addStation(stations);
 	}
 	
 	public void parseCSVRentals(String directory) {

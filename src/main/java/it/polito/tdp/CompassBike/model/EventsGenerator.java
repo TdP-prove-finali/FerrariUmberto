@@ -24,7 +24,8 @@ public class EventsGenerator {
 	private Map<Station, Double> percentageStartStations;
 	private Map<LocalDateTime, Double> percentageTime;
 	
-	private LocalDate day = LocalDate.of(2020, 5, 20);
+	private LocalDate startDate = LocalDate.of(2020, 5, 20);
+	private LocalDate endDate = LocalDate.of(2020, 05, 26);
 	
 	private Integer numRentals;
 	
@@ -96,10 +97,10 @@ public class EventsGenerator {
 	public void loadParameters() {
 		this.stationsIdMap = StationsDAO.getAllStationsSimulator();
 		
-		this.percentageStartStations = RentalsDAO.percentageStartStationsDay(day, this.stationsIdMap);
-		this.percentageTime = RentalsDAO.percentageTimeDay(day);
+		this.percentageStartStations = RentalsDAO.percentageStartStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
+		this.percentageTime = RentalsDAO.percentageTimePeriod(this.startDate, this.endDate);
 		
-		this.numRentals = RentalsDAO.getNumRentalsDay(day);
+		this.numRentals = RentalsDAO.getNumRentalsPeriod(this.startDate, this.endDate);
 		//System.out.println("Num rentals DB "+this.numRentals);
 		
 		this.buildGraph();
@@ -114,8 +115,8 @@ public class EventsGenerator {
 		
 		Graphs.addAllVertices(this.graph, this.stationsIdMap.values());
 		
-		List<Route> route = RentalsDAO.getAllRouteDay(day, this.stationsIdMap);
-		Map<Integer, Map<Integer, Double>> percentageEndStations = RentalsDAO.percentageEndStationsDay(day, this.stationsIdMap);
+		List<Route> route = RentalsDAO.getAllRoutePeriod(this.startDate, this.endDate, this.stationsIdMap);
+		Map<Integer, Map<Integer, Double>> percentageEndStations = RentalsDAO.percentageEndStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
 		
 		for(Route r : route) {
 			if(this.graph.containsVertex(r.getStartStation()) && this.graph.containsVertex(r.getEndStation())) {

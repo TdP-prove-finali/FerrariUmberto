@@ -15,8 +15,8 @@ import it.polito.tdp.CompassBike.model.Bike.BikeStatus;
 public class BikesDAO {
 	
 	/**
-	 * Aggiunge una nuova bici al db.
-	 * @param rental
+	 * Permette di aggiungere nuove {@link BikeData bici} al db, nel caso in cui esista già un bici con lo stesso ID ne vengono aggiornati i parametri.
+	 * @param bikes La {@link List lista} di {@link BikeData bici} da aggiungere
 	 */
 	public static void addBike(List<BikeData> bikes) {
 		String sql = "INSERT INTO bike VALUES(?, ?) ON DUPLICATE KEY UPDATE bike_id = ?";
@@ -51,8 +51,8 @@ public class BikesDAO {
 	
 	
 	/**
-	 * Permette di ottenere il numero di bici presenti nel sistema.
-	 * @return
+	 * Restituisce il numero di bici memorizzate nel db.
+	 * @return Il numero di bici
 	 */
 	public static Integer getNumBike() {
 		String sql = "SELECT COUNT(bike_id) AS num " +
@@ -78,7 +78,8 @@ public class BikesDAO {
 	
 	
 	/**
-	 * Ottenere il numero di poste considerando tutte le stazioni.
+	 * Restituisce il numero totale di docks presenti nel sistema, considerando tutte le {@link Station stazioni} memorizzate nel db.
+	 * @return Il numero di docks
 	 */
 	public static Integer getNumDocks() {
 		String sql = "SELECT SUM(num_docks) AS num " +
@@ -104,7 +105,8 @@ public class BikesDAO {
 	
 	
 	/**
-	 * Dati sulle bici per la simulazione
+	 * Permette di ottenere i dati sulle {@link Bike bici} necessari per la simulazione.
+	 * @return La {@link Map mappa} con l'ID della bici come chiave e l'oggetto {@link Bike bici} come valore.
 	 */
 	public static Map<Integer, Bike> getAllBikesSimulator() {
 		String sql = "SELECT * " +

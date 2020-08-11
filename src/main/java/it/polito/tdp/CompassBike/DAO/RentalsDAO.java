@@ -24,8 +24,8 @@ public class RentalsDAO {
 	// TODO Considerare tutte le restrizioni sul singolo giorno se corrette o da fare sul periodo
 
 	/**
-	 * Permette di aggiungere un nuovo noleggio al database, si tratta di noleggi effettivi del servizio.
-	 * @param rental noleggio da aggiungere
+	 * Permette di aggiungere nuovi noleggi al db.
+	 * @param rentals {@link List lista} di {@link Rental noleggi} da aggiungere
 	 */
 	public static void addRental(List<Rental> rentals) { // TODO Aggiungere più noleggi con una sola connessione
 		String sql = "INSERT INTO rentals VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rental_id = ?";
@@ -65,22 +65,23 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Restituisce il numero di noleggio del giorno passato come parametro.
-	 * @param day
-	 * @return
+	 * Restituisce il numero di noleggio relativi all'intervallo di tempo passato.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @return Il numero di noleggi
 	 */
-	public static Integer getNumRentalsDay(LocalDate day) {
+	public static Integer getNumRentalsPeriod(LocalDate startDate, LocalDate endDate) {
 		Integer result = null;
 		String sql = "SELECT COUNT(*) AS num " + 
 				"FROM rentals " +
-				"WHERE DATE(end_date) = ? AND DATE(start_date) = ?";
+				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ?";
 		
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(day));
-			st.setDate(2, Date.valueOf(day));
+			st.setDate(1, Date.valueOf(startDate));
+			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			if(res.next()) {
 				result = res.getInt("num");
@@ -96,15 +97,17 @@ public class RentalsDAO {
 
 	
 	/**
-	 * Percentuali stazioni di partenza (ristretto ad un giorno).
-	 * @param day
-	 * @return
+	 * Permette di ottenere la percentuale di noleggi iniziati in ogni stazione del sistema, considerando i soli noleggi relativi all'intervallo di tempo passato.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @param stationsIdMap idMap relativa alle stazioni di interesse
+	 * @return La {@link Map mappa} con la {@link Station stazione} come chiave e la percentuale come valore.
 	 */
-	public static Map<Station, Double> percentageStartStationsDay(LocalDate day, Map<Integer, Station> stationsIdMap) {
+	public static Map<Station, Double> percentageStartStationsPeriod(LocalDate startDate, LocalDate endDate, Map<Integer, Station> stationsIdMap) {
 		Map<Station, Double> result = new HashMap<>();
 		String sql = "SELECT start_station_id, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
-				"FROM rentals, stations " + 
-				"WHERE DATE(end_date) = ? AND DATE(start_date) = ? AND rentals.start_station_id = stations.station_id " + 
+				"FROM rentals " + 
+				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ? " + 
 				"GROUP BY start_station_id " + 
 				"ORDER BY perc DESC";
 		
@@ -112,8 +115,8 @@ public class RentalsDAO {
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(day));
-			st.setDate(2, Date.valueOf(day));
+			st.setDate(1, Date.valueOf(startDate));
+			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				Integer id = res.getInt("start_station_id");
@@ -131,15 +134,16 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Percentuale per ogni fascia oraria della giornata.
-	 * @param day
-	 * @return
+	 * Permette di ottenere la percentuale di noleggi per ogni fascia oraria, considerando i soli noleggi relativi all'intervallo di tempo passato.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @return La {@link Map mappa} con la {@link LocalDateTime istante di tempo} come chiave e la percentuale come valore.
 	 */
-	public static Map<LocalDateTime, Double> percentageTimeDay(LocalDate day) {
+	public static Map<LocalDateTime, Double> percentageTimePeriod(LocalDate startDate, LocalDate endDate) {
 		Map<LocalDateTime, Double> result = new HashMap<>();
 		String sql = "SELECT start_date, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
 				"FROM rentals " + 
-				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " + 
+				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ? " + 
 				"GROUP BY start_date " + 
 				"ORDER BY perc DESC";
 		
@@ -147,8 +151,8 @@ public class RentalsDAO {
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(day));
-			st.setDate(2, Date.valueOf(day));
+			st.setDate(1, Date.valueOf(startDate));
+			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				result.put(res.getTimestamp("start_date").toLocalDateTime(), res.getDouble("perc"));
@@ -164,14 +168,16 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Durata massima e minima per ogni itinerario.
-	 * @param stationsIdMap
-	 * @return
+	 * Permette di ottenere la durata massima e minima del tragitto tra ogni coppia di {@link Station stazioni}, considerando i soli noleggi relativi all'intervallo di tempo passato.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @param stationsIdMap idMap relativa alle stazioni di interesse
+	 * @return La {@link List lista} di {@link Route itinerari}
 	 */
-	public static List<Route> getAllRouteDay(LocalDate day, Map<Integer, Station> stationsIdMap) {
+	public static List<Route> getAllRoutePeriod(LocalDate startDate, LocalDate endDate, Map<Integer, Station> stationsIdMap) {
 		String sql = "SELECT start_station_id, end_station_id, MIN(duration) AS min, MAX(duration) AS max " + 
 				"FROM rentals " + 
-				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " + 
+				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ? " + 
 				"GROUP BY start_station_id, end_station_id " + 
 				"ORDER BY start_station_id";
 		List<Route> result = new ArrayList<>();
@@ -180,8 +186,8 @@ public class RentalsDAO {
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(day));
-			st.setDate(2, Date.valueOf(day));
+			st.setDate(1, Date.valueOf(startDate));
+			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				Integer startId = res.getInt("start_station_id");
@@ -203,13 +209,16 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Percentuale stazioni arrivo diviso per stazioni di partenza.
-	 * @return
+	 * Permette di ottenere la percentuale dei noleggi relativi alle diversi {@link Station stazioni} di arrivo rispetto a tutte le stazioni di partenza, considerando i soli noleggi relativi all'intervallo di tempo passato.
+	 * @param startDate Data iniziale
+	 * @param endDate Data finale
+	 * @param stationsIdMap idMap relativa alle stazioni di interesse
+	 * @return La {@link Map mappa} con l'ID della {@link Station stazione} di partenza come chiave e come valore una mappa con chiave l'ID della stazioni di arrivo e valore la relativa percentuale.
 	 */
-	public static Map<Integer, Map<Integer, Double>> percentageEndStationsDay(LocalDate day, Map<Integer, Station> stationsIdMap) {
+	public static Map<Integer, Map<Integer, Double>> percentageEndStationsPeriod(LocalDate startDate, LocalDate endDate, Map<Integer, Station> stationsIdMap) {
 		String sql = "SELECT start_station_id, end_station_id, COUNT(*)/(SUM(COUNT(*)) OVER (PARTITION BY start_station_id))*100 AS perc " + 
 				"FROM rentals " +
-				"WHERE DATE(end_date) = ? AND DATE(start_date) = ? " +
+				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ? " +
 				"GROUP BY start_station_id, end_station_id " + 
 				"ORDER BY start_station_id";
 		Map<Integer, Map<Integer, Double>> result = new HashMap<>();
@@ -218,8 +227,8 @@ public class RentalsDAO {
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(day));
-			st.setDate(2, Date.valueOf(day));
+			st.setDate(1, Date.valueOf(startDate));
+			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			
 			while (res.next()) {

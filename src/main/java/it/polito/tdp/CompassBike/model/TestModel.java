@@ -9,6 +9,9 @@ public class TestModel {
 		
 		Simulator sim = new Simulator();
 		sim.init();
+		Long m = System.currentTimeMillis();
+		Long d = m - inizio;
+		System.out.println(d / 1000.0+"\n");
 		sim.run();
 		
 		Map<Integer, Station> res = sim.getStations();

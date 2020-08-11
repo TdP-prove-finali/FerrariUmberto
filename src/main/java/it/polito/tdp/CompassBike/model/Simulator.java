@@ -272,12 +272,13 @@ public class Simulator {
 		
 		for(Station endStation : Graphs.successorListOf(this.graph, startStation)) {
 			cumulative += this.graph.getEdgeWeight(this.graph.getEdge(startStation, endStation));
+			result = endStation;
 			if(cumulative > percentage) {
-				result = endStation;
 				break;
 			}
 		}
-
+		
+		if(result == null) System.out.println("TORNO NULL "+percentage);
 		return result;
 	}
 	
@@ -290,7 +291,7 @@ public class Simulator {
 	 */
 	private Duration getRandomDuration(Station startStation, Station endStation) { // TODO Da fare meglio, si potrebbe fare con una probabilità per ogni Duration ma viene complesso
 		Random r = new Random();
-		
+		if(endStation == null) System.out.println("END NULL");
 		Long rangeMin = this.graph.getEdge(startStation, endStation).getMinDuration().toMinutes();
 		Long rangeMax = this.graph.getEdge(startStation, endStation).getMaxDuration().toMinutes();
 		Long randomMinutes = (long) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
