@@ -5,9 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import it.polito.tdp.CompassBike.dataImport.Rental;
+import it.polito.tdp.CompassBike.dataImport.BikeData;
 import it.polito.tdp.CompassBike.model.Bike;
 import it.polito.tdp.CompassBike.model.Bike.BikeStatus;
 
@@ -17,18 +18,31 @@ public class BikesDAO {
 	 * Aggiunge una nuova bici al db.
 	 * @param rental
 	 */
-	public static void addBike(Rental rental) {
+	public static void addBike(List<BikeData> bikes) {
 		String sql = "INSERT INTO bike VALUES(?, ?) ON DUPLICATE KEY UPDATE bike_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
+	    	conn.setAutoCommit(false);
 			PreparedStatement st = conn.prepareStatement(sql);
 			
-			st.setInt(1, rental.getBikeId());
-			st.setInt(2, rental.getEndStationId());
-			st.setInt(3, rental.getBikeId());
+			Integer i = 0;
 			
-			st.executeUpdate();
+			for(BikeData bike : bikes) {
+				st.setInt(1, bike.getBikeId());
+				st.setInt(2, bike.getStationId());
+				st.setInt(3, bike.getBikeId());
+			
+				st.addBatch();
+				i++;
+				
+				if(i % 1000 == 0 || i == bikes.size()) {
+					st.executeBatch();
+				}
+			}
+			
+			conn.commit();
+			conn.setAutoCommit(true);
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

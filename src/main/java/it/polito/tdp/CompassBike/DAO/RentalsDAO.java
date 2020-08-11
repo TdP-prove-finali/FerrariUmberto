@@ -27,23 +27,36 @@ public class RentalsDAO {
 	 * Permette di aggiungere un nuovo noleggio al database, si tratta di noleggi effettivi del servizio.
 	 * @param rental noleggio da aggiungere
 	 */
-	public static void addRental(Rental rental) { // TODO Aggiungere più noleggi con una sola connessione
+	public static void addRental(List<Rental> rentals) { // TODO Aggiungere più noleggi con una sola connessione
 		String sql = "INSERT INTO rentals VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rental_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
+	    	conn.setAutoCommit(false);
 			PreparedStatement st = conn.prepareStatement(sql);
 			
-			st.setInt(1, rental.getId());
-			st.setInt(8, rental.getId());
-			st.setInt(2, (int) rental.getDuration().toSeconds());
-			st.setInt(3, rental.getBikeId());
-			st.setTimestamp(4, Timestamp.valueOf(rental.getEndDate()));
-			st.setInt(5, rental.getEndStationId());
-			st.setTimestamp(6, Timestamp.valueOf(rental.getStartDate()));
-			st.setInt(7, rental.getStartStationId());
+			Integer i = 0;
 			
-			st.executeUpdate();
+			for(Rental rental : rentals) {
+				st.setInt(1, rental.getId());
+				st.setInt(8, rental.getId());
+				st.setInt(2, (int) rental.getDuration().toSeconds());
+				st.setInt(3, rental.getBikeId());
+				st.setTimestamp(4, Timestamp.valueOf(rental.getEndDate()));
+				st.setInt(5, rental.getEndStationId());
+				st.setTimestamp(6, Timestamp.valueOf(rental.getStartDate()));
+				st.setInt(7, rental.getStartStationId());
+				
+				st.addBatch();
+				i++;
+				
+				if(i % 1000 == 0 || i == rentals.size()) {
+					st.executeBatch();
+				}
+			}
+			
+			conn.commit();
+			conn.setAutoCommit(true);
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -32,6 +32,7 @@ public class DBConnect {
 			
 			// Configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");
+			config.addDataSourceProperty("rewriteBatchedStatements", "true");
 			config.addDataSourceProperty("prepStmtCacheSize", "250");
 			config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 			

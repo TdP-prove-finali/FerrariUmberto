@@ -24,7 +24,6 @@ public class EventsGenerator {
 	private Map<Station, Double> percentageStartStations;
 	private Map<LocalDateTime, Double> percentageTime;
 	
-	//private LocalDate day = LocalDate.now().minus(2, ChronoUnit.MONTHS).minus(18, ChronoUnit.DAYS);
 	private LocalDate day = LocalDate.of(2020, 5, 20);
 	
 	private Integer numRentals;

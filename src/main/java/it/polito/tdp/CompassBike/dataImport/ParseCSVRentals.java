@@ -19,8 +19,8 @@ public class ParseCSVRentals {
         try {
         	BufferedReader br = new BufferedReader(new FileReader(directory));
         	br.readLine(); //Leggo la prima riga con le intestazioni
-
-            while ((line = br.readLine()) != null) {
+           
+        	while ((line = br.readLine()) != null) {
             	
             	List<String> values = new ArrayList<String>();
             	int start = 0;

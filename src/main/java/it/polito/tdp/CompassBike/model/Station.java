@@ -203,6 +203,26 @@ public class Station {
 	public void removeBike(Bike bike) {
 		this.bikes.remove(bike);
 	}
+	
+	
+	public List<BikeRent> getStartCompletedRent() {
+		List<BikeRent> result = new ArrayList<>();
+		for(BikeRent bk : this.completedRent)
+			if(bk.getStartStation().equals(this))
+				result.add(bk);
+		
+		return result;
+	}
+	
+	
+	public List<BikeRent> getEndCompletedRent() {
+		List<BikeRent> result = new ArrayList<>();
+		for(BikeRent bk : this.completedRent)
+			if(bk.getEndStation().equals(this))
+				result.add(bk);
+		
+		return result;
+	}
 
 
 	@Override

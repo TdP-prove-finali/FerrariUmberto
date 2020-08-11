@@ -29,7 +29,7 @@ public class Simulator {
 	// Parametri di simulazione
 	private EventsGenerator generator;
 	
-	private final Double probabilityNewStation = 0.60;
+	private final Double probabilityNewStation = 0.60; // TODO La faccio variare?
 	
 	// Modello del mondo
 	private Graph<Station, RouteEdge> graph;
@@ -378,11 +378,6 @@ public class Simulator {
 	}
 	
 	
-	// TODO Metodi provvisori
-	public Map<Integer, Station> getStations() {
-		return this.stations;
-	}
-	
 	public Integer getNumCompletedRent() {
 		return this.completedRentals.size();
 	}
@@ -394,5 +389,12 @@ public class Simulator {
 	public Integer getNumRent() {
 		return this.numRent;
 	}
+	
+	// TODO Metodo provvisorio
+	public Map<Integer, Station> getStations() {
+		return this.stations;
+	}
+	
+	
 
 }
