@@ -11,13 +11,13 @@ import it.polito.tdp.CompassBike.model.Station;
 
 public class DataImport {
 	
-	public void parseJSONStations(String directory) {
+	public static void parseJSONStations(String directory) {
 		// TODO Controllo errore impossibile leggere file
 		List<StationData> stations = ParseJSONStations.parse(directory);
 		StationsDAO.addStation(stations);
 	}
 	
-	public void parseCSVRentals(String directory) {
+	public static void parseCSVRentals(String directory) {
 		// TODO Controllo errore impossibile leggere file
 		List<Rental> allRentals = ParseCSVRentals.parse(directory);
 		Map<Integer, Station> stationsIdMap = StationsDAO.getAllStations();

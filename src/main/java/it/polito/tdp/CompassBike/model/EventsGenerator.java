@@ -12,7 +12,6 @@ import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 
 import it.polito.tdp.CompassBike.DAO.RentalsDAO;
-import it.polito.tdp.CompassBike.DAO.StationsDAO;
 import it.polito.tdp.CompassBike.model.Event.EventType;
 
 public class EventsGenerator {
@@ -98,11 +97,12 @@ public class EventsGenerator {
 	 * @param startDate Data iniziale
 	 * @param endDate Data finale
 	 */
-	public void loadParameters(LocalDate startDate, LocalDate endDate) {
+	public void loadParameters(LocalDate startDate, LocalDate endDate, Map<Integer, Station> stationsIdMap) {
+		Long inizio = System.currentTimeMillis();
 		this.startDate = startDate;
 		this.endDate = endDate;
 		
-		this.stationsIdMap = StationsDAO.getAllStationsSimulator();
+		this.stationsIdMap = stationsIdMap;
 		
 		this.percentageStartStations = RentalsDAO.percentageStartStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
 		this.percentageTime = RentalsDAO.percentageTimePeriod(this.startDate, this.endDate);
@@ -111,6 +111,9 @@ public class EventsGenerator {
 		//System.out.println("Num rentals DB "+this.numRentals);
 		
 		this.buildGraph();
+		Long fine = System.currentTimeMillis();
+		Long durata = fine - inizio;
+		System.out.println("TEMPO LOAD "+durata / 1000.0+"\n");
 	}
 	
 	

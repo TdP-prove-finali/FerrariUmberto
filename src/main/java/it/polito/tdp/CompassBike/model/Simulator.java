@@ -33,6 +33,7 @@ public class Simulator {
 	
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private Double variation;
 	
 	// Modello del mondo
 	private Graph<Station, RouteEdge> graph;
@@ -48,27 +49,32 @@ public class Simulator {
 	private Integer numRent;
 	
 	
+	public Simulator() {
+		this.generator = new EventsGenerator();
+	}
+	
+	
 	/**
 	 * Inizializza i parametri di simulazione.
 	 * @param startDate Data iniziale
 	 * @param endDate Data finale
 	 * @param variation Variazione percentuale sul numero di noleggi da generare nel periodo di tempo
 	 */
-	public void init(LocalDate startDate, LocalDate endDate, Double variation) { 
+	public void init(LocalDate startDate, LocalDate endDate, Double variation, Map<Integer, Station> stations) {	
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.variation = variation;
 		
-		this.generator = new EventsGenerator();
-		this.generator.setVariation(variation);
-		this.generator.loadParameters(this.startDate, this.endDate);
+		this.stations = stations;
+		
+		this.generator.setVariation(this.variation);
+		this.generator.loadParameters(this.startDate, this.endDate, this.stations);
 		
 		this.queue = new PriorityQueue<>();
 		this.queue.addAll(this.generator.generateEvents());
 		
 		this.graph = this.generator.getGraph();
 		//System.out.println("Vertici: "+this.graph.vertexSet().size()+"\nArchi: "+this.graph.edgeSet().size());
-		
-		this.stations = this.generator.getStationsGen();
 		
 		this.bikes = BikesDAO.getAllBikesSimulator();
 		this.initBike();
@@ -284,7 +290,8 @@ public class Simulator {
 			}
 		}
 		
-		if(result == null) System.out.println("TORNO NULL "+percentage);
+		//if(result == null) System.out.println("TORNO NULL "+percentage);
+		
 		return result;
 	}
 	
@@ -295,9 +302,11 @@ public class Simulator {
 	 * @param endStation {@link Station Stazione} di arrivo
 	 * @return La {@link Duration durata} casuale
 	 */
-	private Duration getRandomDuration(Station startStation, Station endStation) { // TODO Da fare meglio, si potrebbe fare con una probabilità per ogni Duration ma viene complesso
+	private Duration getRandomDuration(Station startStation, Station endStation) {
+		//if(endStation == null) System.out.println("END NULL");
+		
 		Random r = new Random();
-		if(endStation == null) System.out.println("END NULL");
+		
 		Long rangeMin = this.graph.getEdge(startStation, endStation).getMinDuration().toMinutes();
 		Long rangeMax = this.graph.getEdge(startStation, endStation).getMaxDuration().toMinutes();
 		Long randomMinutes = (long) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
@@ -394,23 +403,17 @@ public class Simulator {
 	}
 	
 	
-	public Integer getNumCompletedRent() {
-		return this.completedRentals.size();
+	public List<BikeRent> getCompletedRent() {
+		return this.completedRentals;
 	}
 	
-	public Integer getNumCanceledRent() {
-		return this.canceledRentals.size();
+	public List<BikeRent> getCanceledRent() {
+		return this.canceledRentals;
 	}
 	
 	public Integer getNumRent() {
 		return this.numRent;
 	}
-	
-	// TODO Metodo provvisorio
-	public Map<Integer, Station> getStations() {
-		return this.stations;
-	}
-	
 	
 
 }
