@@ -1,6 +1,7 @@
 package it.polito.tdp.CompassBike.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +20,8 @@ public class EventsGenerator {
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Station, Double> percentageStartStations;
-	private Map<LocalDateTime, Double> percentageTime;
+	private Map<LocalDate, Double> percentageDayPeriod;
+	private Map<LocalDate, Map<LocalDateTime, Double>> percentageTime;
 	
 	private LocalDate startDate;
 	private LocalDate endDate;
@@ -51,6 +53,7 @@ public class EventsGenerator {
 		Integer numEvents = (int) (this.numRentals * (1.0 - randomUncertainty + this.variation));
 		
 		Random rS = new Random();
+		Random rD = new Random();
 		Random rT = new Random();
 		
 		for(int i = 0; i < numEvents; i++) {
@@ -67,11 +70,24 @@ public class EventsGenerator {
 			}
 			
 			cumulative = 0.0;
+			percentage = rD.nextDouble() * 100.0;
+			LocalDate randomDay = null;
+			
+			for(LocalDate day : this.percentageDayPeriod.keySet()) {
+				cumulative += this.percentageDayPeriod.get(day);
+				randomDay = day;
+				if(cumulative > percentage) {
+					break;
+				}
+			}
+			
+			cumulative = 0.0;
 			percentage = rT.nextDouble() * 100.0;
 			LocalDateTime randomTime = null;
 			
-			for(LocalDateTime time : this.percentageTime.keySet()) {
-				cumulative += this.percentageTime.get(time);
+			Map<LocalDateTime, Double> tempPercentageTime = this.percentageTime.get(randomDay);
+			for(LocalDateTime time : tempPercentageTime.keySet()) {
+				cumulative += tempPercentageTime.get(time);
 				randomTime = time;
 				if(cumulative > percentage) {
 					break;
@@ -88,6 +104,7 @@ public class EventsGenerator {
 		Long fine = System.currentTimeMillis();
 		Long durata = fine - inizio;
 		System.out.println("TEMPO GENERAZIONE "+durata / 1000.0+"\n");
+
 		return result;
 	}
 	
@@ -105,7 +122,11 @@ public class EventsGenerator {
 		this.stationsIdMap = stationsIdMap;
 		
 		this.percentageStartStations = RentalsDAO.percentageStartStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
-		this.percentageTime = RentalsDAO.percentageTimePeriod(this.startDate, this.endDate);
+		this.percentageDayPeriod = RentalsDAO.percentageDayPeriod(this.startDate, this.endDate);
+		this.percentageTime = new HashMap<>();
+		for(LocalDate day = this.startDate; day.isBefore(this.endDate.plusDays(1)); day = day.plusDays(1)) {
+			this.percentageTime.put(day, RentalsDAO.percentageTimeDay(day));
+		}
 		
 		this.numRentals = RentalsDAO.getNumRentalsPeriod(this.startDate, this.endDate);
 		//System.out.println("Num rentals DB "+this.numRentals);
@@ -141,14 +162,9 @@ public class EventsGenerator {
 	}
 	
 	
+	
 	public Graph<Station, RouteEdge> getGraph() {
 		return this.graph;
-	}
-	
-	
-	// TODO Da passare non da qui ma dal model
-	public Map<Integer, Station> getStationsGen() {
-		return this.stationsIdMap;
 	}
 	
 	

@@ -12,9 +12,9 @@ import java.util.List;
 
 public class ParseCSVRentals {
 
-	public static List<Rental> parse(String directory) {
+	public static List<RentalData> parse(String directory) {
         String line = "";
-        List<Rental> rentals = new ArrayList<>();
+        List<RentalData> rentals = new ArrayList<>();
 
         try {
         	BufferedReader br = new BufferedReader(new FileReader(directory));
@@ -47,7 +47,7 @@ public class ParseCSVRentals {
                 LocalDateTime startDate = LocalDateTime.parse(values.get(6), formatter);
                 Integer startStationId = Integer.parseInt(values.get(7));
                 
-                rentals.add(new Rental(id, duration, bikeId, endDate, endStationId, startDate, startStationId));
+                rentals.add(new RentalData(id, duration, bikeId, endDate, endStationId, startDate, startStationId));
             }
             
             br.close();

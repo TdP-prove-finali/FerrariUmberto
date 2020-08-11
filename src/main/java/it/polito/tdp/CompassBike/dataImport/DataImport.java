@@ -19,12 +19,12 @@ public class DataImport {
 	
 	public static void parseCSVRentals(String directory) {
 		// TODO Controllo errore impossibile leggere file
-		List<Rental> allRentals = ParseCSVRentals.parse(directory);
+		List<RentalData> allRentals = ParseCSVRentals.parse(directory);
 		Map<Integer, Station> stationsIdMap = StationsDAO.getAllStations();
 		
 		List<BikeData> bikes = new ArrayList<>();
-		List<Rental> rentals = new ArrayList<>();
-		for(Rental rental : allRentals) {
+		List<RentalData> rentals = new ArrayList<>();
+		for(RentalData rental : allRentals) {
 			if(stationsIdMap.containsKey(rental.getStartStationId()) && stationsIdMap.containsKey(rental.getEndStationId())) {
 				rentals.add(rental);
 				bikes.add(new BikeData(rental.getBikeId(), rental.getEndStationId()));

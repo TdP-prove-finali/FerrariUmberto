@@ -3,7 +3,7 @@ package it.polito.tdp.CompassBike.dataImport;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class Rental {
+public class RentalData {
 	
 	private Integer id;
 	private Duration duration;
@@ -13,7 +13,7 @@ public class Rental {
 	private LocalDateTime startDate;
 	private Integer startStationId;
 	
-	public Rental(Integer id, Duration duration, Integer bikeId, LocalDateTime endDate, Integer endStationId, LocalDateTime startDate, Integer startStationId) {
+	public RentalData(Integer id, Duration duration, Integer bikeId, LocalDateTime endDate, Integer endStationId, LocalDateTime startDate, Integer startStationId) {
 		this.id = id;
 		this.duration = duration;
 		this.bikeId = bikeId;
@@ -24,7 +24,7 @@ public class Rental {
 	}
 	
 
-	public Rental(Integer id, Integer bikeId, LocalDateTime startDate, Integer startStationId,
+	public RentalData(Integer id, Integer bikeId, LocalDateTime startDate, Integer startStationId,
 			String startStationCommonName) {
 		this.id = id;
 		this.bikeId = bikeId;
@@ -99,7 +99,7 @@ public class Rental {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Rental other = (Rental) obj;
+		RentalData other = (RentalData) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

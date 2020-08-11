@@ -13,7 +13,7 @@ public class TestModel {
 		
 		Long inizio = System.currentTimeMillis();
 		
-		model.setParametersSimulation(startDate, endDate, -50.0);
+		model.setParametersSimulation(startDate, endDate, 10.0);
 		model.runSimulation();
 		
 		Map<Integer, Station> res = model.getStationsResult();

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.polito.tdp.CompassBike.dataImport.Rental;
+import it.polito.tdp.CompassBike.dataImport.RentalData;
 import it.polito.tdp.CompassBike.model.Route;
 import it.polito.tdp.CompassBike.model.Station;
 
@@ -23,9 +23,9 @@ public class RentalsDAO {
 
 	/**
 	 * Permette di aggiungere nuovi noleggi al db.
-	 * @param rentals {@link List lista} di {@link Rental noleggi} da aggiungere
+	 * @param rentals {@link List lista} di {@link RentalData noleggi} da aggiungere
 	 */
-	public static void addRental(List<Rental> rentals) {
+	public static void addRental(List<RentalData> rentals) {
 		String sql = "INSERT INTO rentals VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rental_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
@@ -35,7 +35,7 @@ public class RentalsDAO {
 			
 			Integer i = 0;
 			
-			for(Rental rental : rentals) {
+			for(RentalData rental : rentals) {
 				st.setInt(1, rental.getId());
 				st.setInt(8, rental.getId());
 				st.setInt(2, (int) rental.getDuration().toSeconds());
@@ -137,12 +137,12 @@ public class RentalsDAO {
 	 * @param endDate Data finale
 	 * @return La {@link Map mappa} con la {@link LocalDateTime istante di tempo} come chiave e la percentuale come valore.
 	 */
-	public static Map<LocalDateTime, Double> percentageTimePeriod(LocalDate startDate, LocalDate endDate) {
-		Map<LocalDateTime, Double> result = new HashMap<>();
+	public static Map<LocalDate, Double> percentageDayPeriod(LocalDate startDate, LocalDate endDate) {
+		Map<LocalDate, Double> result = new HashMap<>();
 		String sql = "SELECT start_date, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
 				"FROM rentals " + 
 				"WHERE DATE(start_date) >= ? AND DATE(end_date) <= ? " + 
-				"GROUP BY start_date " + 
+				"GROUP BY DATE(start_date) " + 
 				"ORDER BY perc DESC";
 		
 		Connection conn = DBConnect.getConnection();
@@ -153,8 +153,42 @@ public class RentalsDAO {
 			st.setDate(2, Date.valueOf(endDate));
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
+				result.put(res.getDate("start_date").toLocalDate(), res.getDouble("perc"));
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Permette di ottenere la percentuale di noleggi per ogni fascia oraria, considerando i soli noleggi relativi al giorno passato.
+	 * @param day Giorno considerato
+	 * @return La {@link Map mappa} con la {@link LocalDateTime istante di tempo} come chiave e la percentuale come valore.
+	 */
+	public static Map<LocalDateTime, Double> percentageTimeDay(LocalDate day) {
+		Map<LocalDateTime, Double> result = new HashMap<>();
+		String sql = "SELECT start_date, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
+				"FROM rentals " + 
+				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " + 
+				"GROUP BY start_date " + 
+				"ORDER BY perc DESC";
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDate(1, Date.valueOf(day));
+			st.setDate(2, Date.valueOf(day));
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
 				result.put(res.getTimestamp("start_date").toLocalDateTime(), res.getDouble("perc"));
 			}
+			
 			conn.close();
 			return result;
 			
