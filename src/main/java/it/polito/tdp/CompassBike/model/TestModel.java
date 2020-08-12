@@ -9,7 +9,7 @@ public class TestModel {
 		Model model = new Model();
 		
 		LocalDate startDate = LocalDate.of(2020, 5, 20);
-		LocalDate endDate = LocalDate.of(2020, 05, 26);
+		LocalDate endDate = LocalDate.of(2020, 05, 20);
 		
 		Long inizio = System.currentTimeMillis();
 		

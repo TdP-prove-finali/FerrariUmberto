@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class ParseJSONStations {
 		Path path = Paths.get(directory);
 		List<StationData> stations = new ArrayList<StationData>();
  
+		Integer errorLine = 0;
+		
 		JSONArray jsonArray = null;
 	    try {
 	    	String content = Files.readString(path);
@@ -56,11 +59,7 @@ public class ParseJSONStations {
 					
 					switch(key) {
 						case "TerminalName":
-							try {
-								station.setTerminalName(Integer.parseInt(property.getString("value")));
-							} catch(NumberFormatException e) {
-								station.setTerminalName(null);							
-							}	
+							station.setTerminalName(Integer.parseInt(property.getString("value")));
 							break;
 						case "Installed": 
 							station.setInstalled(Boolean.parseBoolean(property.getString("value")));
@@ -80,28 +79,13 @@ public class ParseJSONStations {
 							station.setTemporary(Boolean.parseBoolean(property.getString("value")));
 							break;
 						case "NbBikes":
-							try {
-								station.setNumBikes(Integer.parseInt(property.getString("value")));
-
-							} catch(NumberFormatException e) {
-								station.setNumBikes(0);
-							}
+							station.setNumBikes(Integer.parseInt(property.getString("value")));
 							break;
 						case "NbEmptyDocks":
-							try {
-								station.setNumEmptyDocks(Integer.parseInt(property.getString("value")));
-
-							} catch(NumberFormatException e) {
-								station.setNumEmptyDocks(0);
-							}
+							station.setNumEmptyDocks(Integer.parseInt(property.getString("value")));
 							break;
 						case "NbDocks":
-							try {
-								station.setNumDocks(Integer.parseInt(property.getString("value")));
-
-							} catch(NumberFormatException e) {
-								station.setNumDocks(0);
-							}
+							station.setNumDocks(Integer.parseInt(property.getString("value")));
 							break;
 					}
 				}
@@ -109,8 +93,16 @@ public class ParseJSONStations {
 					station.setBroken(true);
 				
 				stations.add(station);
-			} catch(JSONException e) {}
+			} catch(JSONException e) {errorLine++;}
+			  catch(NumberFormatException e) {errorLine++;}
+			  catch(DateTimeException e) {errorLine++;}
+			
 		}
+		
+		System.out.println("Sono state lette correttamente "+stations.size()+" righe!");
+    	System.out.println(errorLine+" righe contengono uno o più errori di formato!");
+    	Double percentage = ((double) stations.size()) / (stations.size() + errorLine) * 100.0;
+    	System.out.println(String.format("Verrà quindi salvato circa il %.2f%% del file\n", percentage));
 	    
 	    return stations;
 	}

@@ -55,6 +55,7 @@ public class EventsGenerator {
 		Random rS = new Random();
 		Random rD = new Random();
 		Random rT = new Random();
+		Random rM = new Random();
 		
 		for(int i = 0; i < numEvents; i++) {
 			Double cumulative = 0.0;
@@ -83,16 +84,20 @@ public class EventsGenerator {
 			
 			cumulative = 0.0;
 			percentage = rT.nextDouble() * 100.0;
-			LocalDateTime randomTime = null;
+			LocalDateTime randomHalf = null;
 			
 			Map<LocalDateTime, Double> tempPercentageTime = this.percentageTime.get(randomDay);
 			for(LocalDateTime time : tempPercentageTime.keySet()) {
 				cumulative += tempPercentageTime.get(time);
-				randomTime = time;
+				randomHalf = time;
 				if(cumulative > percentage) {
 					break;
 				}
 			}
+			
+			LocalDateTime randomTime = null;
+			Integer minutes = rM.nextInt(30);
+			randomTime = randomHalf.plusMinutes(minutes);
 			
 			if(randomStation != null && randomTime != null) {
 				result.add(new Event(EventType.NOLEGGIO, randomStation, randomTime));
@@ -125,7 +130,7 @@ public class EventsGenerator {
 		this.percentageDayPeriod = RentalsDAO.percentageDayPeriod(this.startDate, this.endDate);
 		this.percentageTime = new HashMap<>();
 		for(LocalDate day = this.startDate; day.isBefore(this.endDate.plusDays(1)); day = day.plusDays(1)) {
-			this.percentageTime.put(day, RentalsDAO.percentageTimeDay(day));
+			this.percentageTime.put(day, RentalsDAO.percentageHalfHourDay(day));
 		}
 		
 		this.numRentals = RentalsDAO.getNumRentalsPeriod(this.startDate, this.endDate);

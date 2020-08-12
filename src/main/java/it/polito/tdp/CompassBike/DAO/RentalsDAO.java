@@ -132,10 +132,10 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Permette di ottenere la percentuale di noleggi per ogni fascia oraria, considerando i soli noleggi relativi all'intervallo di tempo passato.
+	 * Permette di ottenere la percentuale di noleggi effettuati nei diversi giorni dell'intervallo di tempo passato.
 	 * @param startDate Data iniziale
 	 * @param endDate Data finale
-	 * @return La {@link Map mappa} con la {@link LocalDateTime istante di tempo} come chiave e la percentuale come valore.
+	 * @return La {@link Map mappa} con la {@link LocalDate giorno} come chiave e la percentuale come valore.
 	 */
 	public static Map<LocalDate, Double> percentageDayPeriod(LocalDate startDate, LocalDate endDate) {
 		Map<LocalDate, Double> result = new HashMap<>();
@@ -166,16 +166,16 @@ public class RentalsDAO {
 	
 	
 	/**
-	 * Permette di ottenere la percentuale di noleggi per ogni fascia oraria, considerando i soli noleggi relativi al giorno passato.
+	 * Permette di ottenere la percentuale di noleggi per ogni fascia oraria di mezz'ora, considerando i soli noleggi relativi al giorno passato.
 	 * @param day Giorno considerato
 	 * @return La {@link Map mappa} con la {@link LocalDateTime istante di tempo} come chiave e la percentuale come valore.
 	 */
-	public static Map<LocalDateTime, Double> percentageTimeDay(LocalDate day) {
+	public static Map<LocalDateTime, Double> percentageHalfHourDay(LocalDate day) {
 		Map<LocalDateTime, Double> result = new HashMap<>();
-		String sql = "SELECT start_date, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
+		String sql = "SELECT FROM_UNIXTIME(CEILING(UNIX_TIMESTAMP(start_date)/1800)*1800) AS timeslice, COUNT(*)/(SUM(COUNT(*)) OVER())*100 AS perc " + 
 				"FROM rentals " + 
-				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " + 
-				"GROUP BY start_date " + 
+				"WHERE DATE(start_date) = ? AND DATE(end_date) = ? " +
+				"GROUP BY timeslice " + 
 				"ORDER BY perc DESC";
 		
 		Connection conn = DBConnect.getConnection();
@@ -186,7 +186,7 @@ public class RentalsDAO {
 			st.setDate(2, Date.valueOf(day));
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-				result.put(res.getTimestamp("start_date").toLocalDateTime(), res.getDouble("perc"));
+				result.put(res.getTimestamp("timeslice").toLocalDateTime(), res.getDouble("perc"));
 			}
 			
 			conn.close();
