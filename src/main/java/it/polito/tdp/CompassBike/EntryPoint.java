@@ -1,12 +1,10 @@
 package it.polito.tdp.CompassBike;
 
 import javafx.application.Application;
-import static javafx.application.Application.launch;
-
 import it.polito.tdp.CompassBike.model.Model;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -27,6 +25,7 @@ public class EntryPoint extends Application {
         scene.getStylesheets().add("/styles/Styles.css");
         
         stage.setTitle("Compass Bike - Data Import");
+        stage.getIcons().add(new Image(EntryPoint.class.getResourceAsStream("/images/iconYellow.png")));
         stage.setScene(scene);
         stage.show();
     }
