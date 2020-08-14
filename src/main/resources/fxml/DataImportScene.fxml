@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
@@ -16,28 +17,40 @@
    <left>
       <VBox alignment="TOP_CENTER" minHeight="600.0" minWidth="200.0" prefHeight="600.0" prefWidth="250.0" style="-fx-background-color: #F1B434;" BorderPane.alignment="CENTER">
          <children>
-            <Label text="CompassBike">
+            <Label graphicTextGap="8.0" text="CompassBike">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
                <VBox.margin>
                   <Insets bottom="50.0" />
                </VBox.margin>
+               <graphic>
+               	  <FontAwesomeIcon iconName="BICYCLE" size="35" />
+               </graphic>
             </Label>
-            <JFXButton fx:id="btnData" buttonType="RAISED" mouseTransparent="true" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Importa Dati">
+            <JFXButton fx:id="btnData" buttonType="RAISED" graphicTextGap="10.0" mouseTransparent="true" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Importa dati">
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin>
+               <graphic>
+                  <FontAwesomeIcon iconName="DATABASE" size="20" />
+               </graphic>
             </JFXButton>
-            <JFXButton fx:id="btnSimulation" buttonType="RAISED" onAction="#goToSimulation" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Simulazione">
+            <JFXButton fx:id="btnSimulation" buttonType="RAISED" graphicTextGap="10.0" onAction="#goToSimulation" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Simulazione">
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin>
+               <graphic>
+               	  <FontAwesomeIcon iconName="PLAY" size="20" />
+               </graphic>
             </JFXButton>
-            <JFXButton fx:id="btnResult" buttonType="RAISED" onAction="#goToResult" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Risultati">
+            <JFXButton fx:id="btnResult" buttonType="RAISED" graphicTextGap="10.0" onAction="#goToResult" ripplerFill="WHITE" style="-fx-font-size: 18px;" styleClass="jbutton" text="Risultati">
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin>
+               <graphic>
+               	  <FontAwesomeIcon iconName="LIST" size="20" />
+               </graphic>
             </JFXButton>
          </children>
          <BorderPane.margin>
