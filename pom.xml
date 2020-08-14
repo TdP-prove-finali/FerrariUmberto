@@ -22,12 +22,12 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>11.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11</version>
+            <version>11.0.1</version>
         </dependency>
         <dependency>
 		    <groupId>com.zaxxer</groupId>
@@ -60,8 +60,17 @@
 	       <artifactId>slf4j-log4j12</artifactId>
 	       <version>1.7.5</version>
 	    </dependency>
-        
-    </dependencies>
+		<dependency>
+			<groupId>com.jfoenix</groupId>
+			<artifactId>jfoenix</artifactId>
+			<version>9.0.10</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>20200518</version>
+		</dependency>
+	</dependencies>
     <build>
         <plugins>
             <plugin>

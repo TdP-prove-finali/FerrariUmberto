@@ -1,5 +1,7 @@
 package it.polito.tdp.CompassBike.dataImport;
 
+import java.io.File;
+
 import it.polito.tdp.CompassBike.model.Model;
 
 public class TestDataImport {
@@ -11,8 +13,10 @@ public class TestDataImport {
 		
 		System.out.println("INIZIO");
 		
-		model.loadFileStations("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Stazioni\\s.txt");
-		model.loadFileRentals("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Viaggi\\last.csv");
+		File stationsFile = new File("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Stazioni\\s.txt");
+		File rentalsFile = new File("C:\\Users\\Umberto\\Dropbox\\PoliTO\\Tesi\\Dataset\\Viaggi\\last.csv");
+		model.loadFileStations(stationsFile);
+		model.loadFileRentals(rentalsFile);
 		
 		System.out.println("FINE");
 		

@@ -2,9 +2,12 @@ package it.polito.tdp.CompassBike;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+
+import it.polito.tdp.CompassBike.model.Model;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
@@ -12,12 +15,18 @@ public class EntryPoint extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/DataImportScene.fxml"));
+        BorderPane root = loader.load();
+		
+        DataController controller = loader.getController();
+		
+        Model model = new Model();
+		controller.setModel(model);
         
-        Scene scene = new Scene(root);
+		Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("Compass Bike - Data Import");
         stage.setScene(scene);
         stage.show();
     }

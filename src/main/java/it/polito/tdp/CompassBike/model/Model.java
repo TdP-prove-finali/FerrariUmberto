@@ -1,5 +1,6 @@
 package it.polito.tdp.CompassBike.model;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -22,13 +23,13 @@ public class Model {
 	}
 	
 	
-	public void loadFileStations(String directory) {
-		DataImport.parseJSONStations(directory);
+	public void loadFileStations(File file) {
+		DataImport.parseJSONStations(file);
 	}
 	
 	
-	public void loadFileRentals(String directory) {
-		DataImport.parseCSVRentals(directory);
+	public void loadFileRentals(File file) {
+		DataImport.parseCSVRentals(file);
 	}
 	
 	

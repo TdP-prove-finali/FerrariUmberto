@@ -1,5 +1,6 @@
 package it.polito.tdp.CompassBike.dataImport;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,12 +18,15 @@ import org.json.JSONException;
 
 public class ParseJSONStations {
 	
+	private Integer correctLine = 0;
+	private Integer errorLine = 0;
+	
 	/**
 	 * Metodo di utilità per leggere un file JSON che contiene le informazioni sulle stazioni
 	 * @return ritorna la lista delle stazioni
 	 */
-	public static List<StationData> parse(String directory) {
-		Path path = Paths.get(directory);
+	public List<StationData> parse(File file) {
+		Path path = Paths.get(file.getAbsolutePath());
 		List<StationData> stations = new ArrayList<StationData>();
  
 		Integer errorLine = 0;
@@ -99,12 +103,25 @@ public class ParseJSONStations {
 			
 		}
 		
+		this.correctLine = stations.size();
+		this.errorLine = errorLine;
+		
 		System.out.println("Sono state lette correttamente "+stations.size()+" righe!");
     	System.out.println(errorLine+" righe contengono uno o più errori di formato!");
     	Double percentage = ((double) stations.size()) / (stations.size() + errorLine) * 100.0;
     	System.out.println(String.format("Verrà quindi salvato circa il %.2f%% del file\n", percentage));
 	    
 	    return stations;
+	}
+	
+	
+	public Integer getNumCorrectLine() {
+		return this.correctLine;
+	}
+	
+	
+	public Integer getNumErrorLine() {
+		return this.errorLine;
 	}
 
 }

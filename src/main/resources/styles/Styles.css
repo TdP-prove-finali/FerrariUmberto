@@ -1,3 +1,12 @@
 .button {
     -fx-font-weight: bold;
 }
+
+.jbutton:hover{
+    -fx-cursor: hand;
+}
+
+#tableRentals .table-column {
+  -fx-alignment: CENTER;
+  -fx-font-size:13px;
+}

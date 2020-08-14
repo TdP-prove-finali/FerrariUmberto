@@ -1,6 +1,7 @@
 package it.polito.tdp.CompassBike.dataImport;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
@@ -12,15 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParseCSVRentals {
+	
+	private Integer correctLine = 0;
+	private Integer errorLine = 0;
 
-	public static List<RentalData> parse(String directory) {
+	public List<RentalData> parse(File file) {
         String line = "";
         List<RentalData> rentals = new ArrayList<>();
 
         Integer errorLine = 0;
         
+        
         try {
-        	BufferedReader br = new BufferedReader(new FileReader(directory));
+        	BufferedReader br = new BufferedReader(new FileReader(file));
         	br.readLine(); //Leggo la prima riga con le intestazioni
            
         	while ((line = br.readLine()) != null) {
@@ -64,6 +69,9 @@ public class ParseCSVRentals {
                   catch(DateTimeParseException e) {errorLine++;}
             }
         	
+        	this.correctLine = rentals.size();
+    		this.errorLine = errorLine;
+        	
         	System.out.println("Sono state lette correttamente "+rentals.size()+" righe!");
         	System.out.println(errorLine+" righe contengono uno o più errori di formato!");
         	Double percentage = ((double) rentals.size()) / (rentals.size() + errorLine) * 100.0;
@@ -76,6 +84,16 @@ public class ParseCSVRentals {
         }
         
         return rentals;
+	}
+	
+	
+	public Integer getNumCorrectLine() {
+		return this.correctLine;
+	}
+	
+	
+	public Integer getNumErrorLine() {
+		return this.errorLine;
 	}
 
 }

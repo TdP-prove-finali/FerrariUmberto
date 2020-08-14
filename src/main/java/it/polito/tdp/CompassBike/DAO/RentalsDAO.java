@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.polito.tdp.CompassBike.dataImport.RentalData;
+import it.polito.tdp.CompassBike.model.GroupRentals;
 import it.polito.tdp.CompassBike.model.Route;
 import it.polito.tdp.CompassBike.model.Station;
 
@@ -281,6 +282,33 @@ public class RentalsDAO {
 						result.put(startId, temp);
 					}
 				}
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	public static List<GroupRentals> getGroupRentals() {
+		String sql = "SELECT MIN(tab.dat) AS fromDate, MAX(tab.dat) AS toDate, COUNT(*) AS num " + 
+				"FROM (select DATE(start_date) AS dat, DATE(start_date) - (dense_rank() over(order by DATE(start_date))) AS g " + 
+				"FROM rentals\r\n) AS tab " + 
+				"GROUP BY tab.g " + 
+				"ORDER BY 1";
+		List<GroupRentals> result = new ArrayList<>();
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			
+			while (res.next()) {
+				result.add(new GroupRentals(res.getDate("fromDate").toLocalDate(), res.getDate("toDate").toLocalDate(), res.getInt("num")));
 			}
 			conn.close();
 			return result;
