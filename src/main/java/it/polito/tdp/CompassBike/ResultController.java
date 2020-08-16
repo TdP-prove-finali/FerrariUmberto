@@ -170,6 +170,7 @@ public class ResultController {
         	list.sort(null);
         	
         	// TODO Da settare meglio le dimensioni delle colonne
+        	// TODO Centrare le celle
         	
         	TableColumn<Station, Integer> idColumn = new TableColumn<>("ID");
         	idColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("id"));
