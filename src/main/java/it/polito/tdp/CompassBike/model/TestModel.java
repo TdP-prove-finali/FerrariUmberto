@@ -8,6 +8,7 @@ public class TestModel {
 	public static void main(String[] args) {
 		Model model = new Model();
 		
+		/*
 		LocalDate startDate = LocalDate.of(2020, 05, 20);
 		LocalDate endDate = LocalDate.of(2020, 05, 26);
 		
@@ -30,6 +31,11 @@ public class TestModel {
 		Long fine = System.currentTimeMillis();
 		Long durata = fine - inizio;
 		System.out.println(durata / 1000.0);
+		*/
+		
+		model.getMapsStations();
+		System.out.println("QUI");
+		System.out.println("FATTO");
 	}
 
 }

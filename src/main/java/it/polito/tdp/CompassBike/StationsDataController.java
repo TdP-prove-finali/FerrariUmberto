@@ -7,7 +7,9 @@ import it.polito.tdp.CompassBike.dataImport.DataImport;
 import it.polito.tdp.CompassBike.model.Model;
 import it.polito.tdp.CompassBike.model.Station;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -413,7 +415,14 @@ public class StationsDataController {
 
     @FXML
     void doShowMap(ActionEvent event) {
-    	// TODO Creare e aprire la mappa
+    	File map = this.model.getMapsStations();
+    	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            try {
+				Desktop.getDesktop().browse(map.toURI());
+			} catch (IOException e) {
+				System.out.println("Impossibile aprire il Browser per mostrare la mappa!");
+			}
+        }
     }
     
 

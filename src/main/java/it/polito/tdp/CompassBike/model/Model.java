@@ -17,9 +17,12 @@ public class Model {
 	private LocalDate endDate;
 	private Double variation;
 	
+	private MapsGenerator mapsGenerator;
+	
 	
 	public Model() {
 		this.simulator = new Simulator();
+		this.mapsGenerator = new MapsGenerator();
 	}
 	
 	
@@ -64,6 +67,16 @@ public class Model {
 	
 	public Integer getNumRent() {
 		return this.simulator.getNumRent();
+	}
+	
+	
+	public File getMapsStations() {
+		return this.mapsGenerator.generateMapStations();
+	}
+	
+	
+	public File getMapsResult() {
+		return this.mapsGenerator.generateMapResult(this.stations);
 	}
 	
 }

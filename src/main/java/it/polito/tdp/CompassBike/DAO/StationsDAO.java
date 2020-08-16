@@ -349,5 +349,39 @@ public class StationsDAO {
 			return false;
 		}
 	}
+	
+	
+	public static Double[] getCenterArea() {
+		String sql = "SELECT MAX(latitude) AS maxLat, MIN(latitude) AS minLat, MAX(longitude) AS maxLon, MIN(longitude) AS minLon " + 
+				"FROM stations " +
+				"WHERE station_id < 9000";
+		Double[] result = new Double[2];
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			if(res.next()) {
+				Double maxLat = res.getDouble("maxLat");
+				Double minLat = res.getDouble("minLat");
+				Double maxLon = res.getDouble("maxLon");
+				Double minLon = res.getDouble("minLon");
+				
+				Double centerLat = (maxLat - minLat) / 2.0 + minLat;
+				Double centerLon = (maxLon - minLon) / 2.0 + minLon;
+				
+				result[0] = centerLat;
+				result[1] = centerLon;
+			}
+			
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 }
