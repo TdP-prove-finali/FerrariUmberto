@@ -19,6 +19,7 @@ import it.polito.tdp.CompassBike.DAO.BikesDAO;
 import it.polito.tdp.CompassBike.model.Bike.BikeStatus;
 import it.polito.tdp.CompassBike.model.BikeRent.BikeRentStatus;
 import it.polito.tdp.CompassBike.model.Event.EventType;
+import it.polito.tdp.CompassBike.model.Station.ProblemType;
 
 public class Simulator {
 	
@@ -42,8 +43,8 @@ public class Simulator {
 	private Map<Integer, Bike> bikes;
 	
 	// Valori da calcolare
-	private List<BikeRent> completedRentals;
-	private List<BikeRent> canceledRentals;
+	private List<BikeRent> completedRent;
+	private List<BikeRent> canceledRent;
 	private List<BikeRent> emptyStationRent;
 	private List<BikeRent> fullStationRent;
 	private Integer numRent;
@@ -79,8 +80,8 @@ public class Simulator {
 		this.bikes = BikesDAO.getAllBikesSimulator();
 		this.initBike();
 		
-		this.completedRentals = new ArrayList<>();
-		this.canceledRentals = new ArrayList<>();
+		this.completedRent = new ArrayList<>();
+		this.canceledRent = new ArrayList<>();
 		this.emptyStationRent = new ArrayList<>();
 		this.fullStationRent = new ArrayList<>();
 		this.numRent = 0;
@@ -156,6 +157,8 @@ public class Simulator {
 			Event e = this.queue.poll();
 			this.processEvent(e);
 		}
+		
+		this.setProblems();
 	}
 
 
@@ -209,7 +212,7 @@ public class Simulator {
 				
 				bikeRent.setStatus(BikeRentStatus.COMPLETATO);
 				
-				this.completedRentals.add(bikeRent);
+				this.completedRent.add(bikeRent);
 				startStation.addCompletedRent(bikeRent);
 				endStation.addCompletedRent(bikeRent);
 			} else {
@@ -262,7 +265,7 @@ public class Simulator {
 			} else {
 				// Annullamento noleggio
 				bikeRent.setStatus(BikeRentStatus.CANCELLATO);
-				this.canceledRentals.add(bikeRent);
+				this.canceledRent.add(bikeRent);
 				startStation.addCanceledRent(bikeRent);
 			}
 			break;
@@ -395,6 +398,47 @@ public class Simulator {
 	
 	
 	/**
+	 * Identifica e setta per ogni stazione il problema più rilevante.
+	 */
+	private void setProblems() {
+		Double avgCanceled = ((double) this.canceledRent.size()) / ((double) this.stations.size());
+		Double avgEmpty = ((double) this.emptyStationRent.size()) / ((double) this.stations.size());
+		Double avgFull = ((double) this.fullStationRent.size()) / ((double) this.stations.size());
+		
+		Double percCanceled = 0.0;
+		Double percEmpty = 0.0;
+		Double percFull = 0.0;
+		
+		for(Integer id : this.stations.keySet()) {
+			Station st = this.stations.get(id);
+			
+			percCanceled = 0.0;
+			percEmpty = 0.0;
+			percFull = 0.0;
+			
+			if(st.getNumCanceledRent() > avgCanceled) 
+				percCanceled = (st.getNumCanceledRent() - avgCanceled) / avgCanceled * 100.0;
+			
+			if(st.getNumEmptyStationRent() > avgEmpty)
+				percEmpty = (st.getNumEmptyStationRent() - avgEmpty) / avgEmpty * 100.0;
+			
+			if(st.getNumFullStationRent() > avgFull)
+				percFull = (st.getNumFullStationRent() - avgFull) / avgFull * 100.0;
+			
+			if(percCanceled > percEmpty && percCanceled > percFull)
+				st.setProblemType(ProblemType.TRAFFICO);
+			else if(percEmpty > percCanceled && percEmpty > percFull)
+				st.setProblemType(ProblemType.VUOTA);
+			else if(percFull > percCanceled && percFull > percCanceled)
+				st.setProblemType(ProblemType.PIENA);
+			else
+				st.setProblemType(ProblemType.NESSUNO);
+		}
+		
+	}
+	
+	
+	/**
 	 * Permette di inserire la probabilità per cui un utente cerchi una nuova stazioni da cui noleggiare una bici nel caso in cui quella in cui si trova risulti vuota.
 	 * @param probability La probabilità scelta
 	 */
@@ -404,15 +448,23 @@ public class Simulator {
 	
 	
 	public List<BikeRent> getCompletedRent() {
-		return this.completedRentals;
+		return this.completedRent;
 	}
 	
 	public List<BikeRent> getCanceledRent() {
-		return this.canceledRentals;
+		return this.canceledRent;
 	}
 	
 	public Integer getNumRent() {
 		return this.numRent;
+	}
+	
+	public Integer getNumEmptyRent() {
+		return this.emptyStationRent.size();
+	}
+	
+	public Integer getNumFullRent() {
+		return this.fullStationRent.size();
 	}
 	
 

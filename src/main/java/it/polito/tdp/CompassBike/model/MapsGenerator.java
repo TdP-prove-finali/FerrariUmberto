@@ -23,7 +23,7 @@ public class MapsGenerator {
 								"    <style>\r\n" + 
 								"        body { margin: 0; padding: 0; }\r\n" + 
 								"        #map { position: absolute; top: 0; bottom: 0; width: 100%; }\r\n" + 
-								".legend {\r\n" + 
+								"		 .legend {\r\n" + 
 								"            background-color: #fff;\r\n" + 
 								"            border-radius: 3px;\r\n" + 
 								"            top: 30px;\r\n" + 
@@ -71,10 +71,18 @@ public class MapsGenerator {
 								"    <h2>Legenda</h2>\r\n" + 
 								"    <div><span style=\"background-color: blue\"></span>Stazioni installate sul territorio</div>\r\n" + 
 								"    <div><span style=\"background-color: red\"></span>Stazioni aggiunte manualmente dall'utente</div>\r\n" + 
-								"    <br\\>" +
+								"    <br \\>" +
 								"    <div><i>Selezionare una stazione per visualizzarne le informazioni</i></div>\r\n" +
 								"</div>\r\n";
-	private final String LEGEND_RESULT = ""; // TODO Da fare legenda result
+	private final String LEGEND_RESULT = "<div id=\"legend\" class=\"legend\">\r\n" + 
+								"    <h2>Legenda</h2>\r\n" + 
+								"    <div><span style=\"background-color: green\"></span>Stazioni che non presentano problemi rilevanti</div>\r\n" + 
+								"    <div><span style=\"background-color: red\"></span>Stazioni ad alto traffico</div>\r\n" + 
+								"    <div><span style=\"background-color: blue\"></span>Stazioni spesso piene</div>\r\n" + 
+								"    <div><span style=\"background-color: orange\"></span>Stazioni spesso vuote</div>\r\n" + 
+								"    <br \\>" +
+								"    <div><i>Selezionare una stazione per visualizzarne le informazioni</i></div>\r\n" +
+								"</div>\r\n";
 
 	
 	
@@ -144,11 +152,7 @@ public class MapsGenerator {
 			for(Integer id : stations.keySet()) {
 				myPopUp = this.POPUP + this.toStringHTMLResult(stations.get(id)) + ");\r\n";
 				
-				// TODO Da fare scelta colori
-				String color = "'blue'";
-				if(id > 9000)
-					color = "'red'";
-				
+				String color = this.colorStation(stations.get(id));
 				myMarker = this.MARKER + color + "})" + ".setLngLat([" + stations.get(id).getLongitude() + ", " + stations.get(id).getLatitude() + "])" + ".setPopup(popup).addTo(map);\r\n";
 				
 				writer.write(myPopUp);
@@ -173,13 +177,13 @@ public class MapsGenerator {
 		
 		result += "\"";
 		result += "<b>" + station.getCommonName() + "</b>";
-		result += "<br\\><br\\>";
-		result += "<i>ID: " + station.getId() + "</i>";
-		result += "<br\\>";
-		result += "<i>Numero docks: " + station.getNumDocks() + "</i>";
-		result += "<br\\>";
-		result += "<i>Numero bici: " + station.getNumBikes() + "</i>";
-		result += "<br\\>";
+		result += "<br \\>";
+		result += "<i>ID: </i>" + station.getId();
+		result += "<br \\><br \\>";
+		result += "<i>Numero docks: </i>" + station.getNumDocks();
+		result += "<br \\>";
+		result += "<i>Numero bici: </i>" + station.getNumBikes();
+		result += "<br \\>";
 		result += "\"";
 		
 		return result;
@@ -189,9 +193,44 @@ public class MapsGenerator {
 	private String toStringHTMLResult(Station station) {
 		String result = "";
 		
-		// TODO Da fare HTML result
+		result += "\"";
+		result += "<b>" + station.getCommonName() + "</b>";
+		result += "<br \\>";
+		result += "<i>ID: </i>" + station.getId();
+		result += "<br \\><br \\>";
+		result += "<i>Noleggi completati: </i>" + station.getCompletedRent().size();
+		result += "<br \\>";
+		result += "<i>Noleggi cancellati: </i>" + station.getCanceledRent().size();
+		result += "<br \\>";
+		result += "<i>Tentativi di noleggio falliti (bici non disponibili): </i>" + station.getEmptyStationRent().size();
+		result += "<br \\>";
+		result += "<i>Tentativi di riconsegna falliti (stazione piena): </i>" + station.getFullStationRent().size();
+		result += "<br \\>";
+		result += "\"";
 		
 		return result;
+	}
+	
+	
+	private String colorStation(Station station) {
+		String color = "";
+		
+		switch(station.getProblemType()) {
+			case NESSUNO:
+				color = "'green'";
+				break;
+			case PIENA:
+				color = "'blue'";
+				break;
+			case TRAFFICO:
+				color = "'red'";
+				break;
+			case VUOTA:
+				color = "'orange'";
+				break;
+		}
+		
+		return color;
 	}
 	
 }

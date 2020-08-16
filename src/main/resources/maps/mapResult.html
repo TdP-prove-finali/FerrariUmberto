@@ -10,10 +10,44 @@
     <style>
         body { margin: 0; padding: 0; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .legend {
+            background-color: #fff;
+            border-radius: 3px;
+            top: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            padding: 10px;
+            position: absolute;
+            right: 20px;
+            z-index: 1;
+        }
+        .legend h2 {
+            margin: 0 0 10px;
+        }
+        .legend div {
+            margin: 0 0 5px;
+        }
+        .legend div span {
+            border-radius: 50%;
+            display: inline-block;
+            height: 12px;
+            margin-right: 5px;
+            width: 12px;
+        }
     </style>
 </head>
 <body>
 <div id="map"></div>
+
+<div id="legend" class="legend">
+    <h2>Legenda</h2>
+    <div><span style="background-color: green"></span>Stazioni che non presentano problemi rilevanti</div> 
+    <div><span style="background-color: red"></span>Stazioni ad alto traffico</div>
+    <div><span style="background-color: blue"></span>Stazioni spesso piene</div>
+    <div><span style="background-color: orange"></span>Stazioni spesso vuote</div>
+    <br \>
+    <div><i>Selezionare una stazione per visualizzarne le informazioni</i></div>	
+</div>
 
 <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoidW1mZXJyYXJpIiwiYSI6ImNrZHQ5YnFvZzB6Zmcyd2xpejQxMTlqcmgifQ.4qzD5w0tVvXER5iNPd7Puw';

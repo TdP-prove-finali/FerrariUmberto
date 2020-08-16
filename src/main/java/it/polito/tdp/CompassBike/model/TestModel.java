@@ -3,6 +3,7 @@ package it.polito.tdp.CompassBike.model;
 import java.time.LocalDate;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class TestModel {
 
 	public static void main(String[] args) {

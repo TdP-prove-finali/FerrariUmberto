@@ -5,6 +5,10 @@ import java.util.List;
 
 public class Station implements Comparable<Station> {
 	
+	public enum ProblemType {
+		NESSUNO, TRAFFICO, VUOTA, PIENA
+	}
+	
 	private Integer id;
 	private String commonName;
 	
@@ -22,6 +26,14 @@ public class Station implements Comparable<Station> {
 	private List<BikeRent> emptyStationRent;
 	private List<BikeRent> fullStationRent;
 	
+	private Integer numCompletedRent;
+	private Integer numCanceledRent;
+	private Integer numEmptyStationRent;
+	private Integer numFullStationRent;
+	
+	private ProblemType problemType;
+	private String problemString;
+	
 	
 	public Station(Integer id, String commonName, Integer numBikes, Integer numEmptyDocks, Integer numDocks,
 			Double latitude, Double longitude) {
@@ -37,6 +49,10 @@ public class Station implements Comparable<Station> {
 		this.canceledRent = new ArrayList<>();
 		this.emptyStationRent = new ArrayList<>();
 		this.fullStationRent = new ArrayList<>();
+		this.numCompletedRent = 0;
+		this.numCanceledRent = 0;
+		this.numEmptyStationRent = 0;
+		this.numFullStationRent = 0;
 	}
 	
 	
@@ -110,18 +126,8 @@ public class Station implements Comparable<Station> {
 	}
 
 
-	public void setCompletedRent(List<BikeRent> completedRent) {
-		this.completedRent = completedRent;
-	}
-
-
 	public List<BikeRent> getCanceledRent() {
 		return canceledRent;
-	}
-
-
-	public void setCanceledRent(List<BikeRent> canceledRent) {
-		this.canceledRent = canceledRent;
 	}
 
 
@@ -147,41 +153,35 @@ public class Station implements Comparable<Station> {
 	
 	public void addCompletedRent(BikeRent rent) {
 		this.completedRent.add(rent);
+		this.numCompletedRent++;
 	}
 	
 	
 	public void addCanceledRent(BikeRent rent) {
 		this.canceledRent.add(rent);
+		this.numCanceledRent++;
 	}
 
 
 	public List<BikeRent> getEmptyStationRent() {
 		return emptyStationRent;
 	}
-
-
-	public void setEmptyStationRent(List<BikeRent> emptyStationRent) {
-		this.emptyStationRent = emptyStationRent;
-	}
 	
 	
 	public void addEmptyStationRent(BikeRent rent) {
 		this.emptyStationRent.add(rent);
+		this.numEmptyStationRent++;
 	}
 
 
 	public List<BikeRent> getFullStationRent() {
 		return fullStationRent;
 	}
-
-
-	public void setFullStationRent(List<BikeRent> fullStationRent) {
-		this.fullStationRent = fullStationRent;
-	}
 	
 	
 	public void addFullStationRent(BikeRent rent) {
 		this.fullStationRent.add(rent);
+		this.numFullStationRent++;
 	}
 
 
@@ -202,6 +202,55 @@ public class Station implements Comparable<Station> {
 	
 	public void removeBike(Bike bike) {
 		this.bikes.remove(bike);
+	}
+	
+	
+	public ProblemType getProblemType() {
+		return problemType;
+	}
+
+
+	public void setProblemType(ProblemType problemType) {
+		this.problemType = problemType;
+		switch(problemType) {
+			case NESSUNO:
+				this.problemString = "Nessun problema riscontrato";
+				break;
+			case PIENA:
+				this.problemString = "Stazione spesso piena";
+				break;
+			case TRAFFICO:
+				this.problemString = "Stazione ad alto traffico";
+				break;
+			case VUOTA:
+				this.problemString = "Stazione spesso vuota";
+				break;
+		}
+	}
+
+
+	public Integer getNumCompletedRent() {
+		return numCompletedRent;
+	}
+
+
+	public Integer getNumCanceledRent() {
+		return numCanceledRent;
+	}
+
+
+	public Integer getNumEmptyStationRent() {
+		return numEmptyStationRent;
+	}
+
+
+	public Integer getNumFullStationRent() {
+		return numFullStationRent;
+	}
+	
+	
+	public String getProblemString() {
+		return problemString;
 	}
 	
 	
@@ -261,5 +310,6 @@ public class Station implements Comparable<Station> {
 	public int compareTo(Station o) {
 		return this.id.compareTo(o.id);
 	}
+
 	
 }

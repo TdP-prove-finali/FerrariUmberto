@@ -70,6 +70,26 @@ public class Model {
 	}
 	
 	
+	public Integer getNumCompletedRent() {
+		return this.simulator.getCompletedRent().size();
+	}
+	
+	
+	public Integer getNumCanceledRent() {
+		return this.simulator.getCanceledRent().size();
+	}
+	
+	
+	public Integer getNumEmptyRent() {
+		return this.simulator.getNumEmptyRent();
+	}
+	
+	
+	public Integer getNumFullRent() {
+		return this.simulator.getNumFullRent();
+	}
+	
+	
 	public File getMapsStations() {
 		return this.mapsGenerator.generateMapStations();
 	}
