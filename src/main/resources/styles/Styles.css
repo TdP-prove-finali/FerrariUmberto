@@ -2,8 +2,32 @@
     -fx-font-weight: bold;
 }
 
-.jbutton:hover{
+.jbuttonmenu {
+	-fx-font-size: 18px;
+	-jfx-button-type: RAISED;
+}
+
+.jbuttonmenu .jfx-rippler{
+     -jfx-rippler-fill: #F1B434; 
+}
+
+.jbuttonmenu:hover {
     -fx-cursor: hand;
+    -fx-background-color: #eeeeee;
+}
+
+.jbutton {
+	-jfx-button-type: RAISED;
+    -fx-background-color: #eeeeee;
+    -fx-font-size: 14px;
+}
+
+.jbutton .jfx-rippler{
+     -jfx-rippler-fill: #545454;
+}
+
+.jbutton:hover {
+	-fx-cursor: hand;
 }
 
 #tableRentals .table-column {

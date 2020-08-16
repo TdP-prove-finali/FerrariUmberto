@@ -13,19 +13,20 @@ public class EntryPoint extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/DataImportScene.fxml"));
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/StationsDataImport.fxml"));
         BorderPane root = loader.load();
 		
-        DataController controller = loader.getController();
+        StationsDataController controller = loader.getController();
 		
         Model model = new Model();
 		controller.setModel(model);
+		controller.setStage(stage);
         
 		Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("Compass Bike - Data Import");
-        stage.getIcons().add(new Image(EntryPoint.class.getResourceAsStream("/images/iconYellow.png")));
+        stage.setTitle("Compass Bike - Stations Data");
+        stage.getIcons().add(new Image(EntryPoint.class.getResourceAsStream("/images/icon.png")));
         stage.setScene(scene);
         stage.show();
     }
