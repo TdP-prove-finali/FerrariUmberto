@@ -3,7 +3,7 @@ package it.polito.tdp.CompassBike.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Station {
+public class Station implements Comparable<Station> {
 	
 	private Integer id;
 	private String commonName;
@@ -249,6 +249,17 @@ public class Station {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	
+	
+	public String toString() {
+		return this.id+" - "+this.commonName;
+	}
+
+
+	@Override
+	public int compareTo(Station o) {
+		return this.id.compareTo(o.id);
 	}
 	
 }

@@ -71,11 +71,6 @@ public class ParseCSVRentals {
         	
         	this.correctLine = rentals.size();
     		this.errorLine = errorLine;
-        	
-        	System.out.println("Sono state lette correttamente "+rentals.size()+" righe!");
-        	System.out.println(errorLine+" righe contengono uno o più errori di formato!");
-        	Double percentage = ((double) rentals.size()) / (rentals.size() + errorLine) * 100.0;
-        	System.out.println(String.format("Verrà quindi salvato circa il %.2f%% del file\n", percentage));
             
             br.close();
             

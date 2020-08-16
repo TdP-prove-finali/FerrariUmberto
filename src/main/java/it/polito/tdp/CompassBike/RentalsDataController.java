@@ -59,6 +59,8 @@ public class RentalsDataController {
 
     @FXML
     void doLoadRentals(ActionEvent event) {
+    	this.lblResultFileRentals.setText("");
+    	
     	FileChooser fileChooser = new FileChooser();
     	fileChooser.setTitle("Importa noleggi");
     	FileChooser.ExtensionFilter extentionFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
@@ -83,11 +85,17 @@ public class RentalsDataController {
 			} else {
 				Integer correctLine = res[1];
 				Integer errorLine = res[2];
-				Double percentage = ((double) correctLine) / (correctLine + errorLine) * 100.0;
-				textLbl = String.format("E' stato salvato il %.1f%% del file, in quanto %d righe contengono errori di formato.", percentage, errorLine);
+				if(errorLine > 0) {
+					Double percentage = ((double) correctLine) / (correctLine + errorLine) * 100.0;
+					textLbl = String.format("E' stato salvato il %.1f%% del file, in quanto %d righe contenevano errori di formato.", percentage, errorLine);
+				} else {
+					textLbl = String.format("E' stato salvato il 100%% del file, il file non conteneva errori di formato.");
+				}
 			}
 			this.lblResultFileRentals.setText(textLbl);
 		}
+		
+		this.loadTableGroupRentals();
     }
     
 
@@ -164,6 +172,18 @@ public class RentalsDataController {
     public void setModel(Model model) {
     	this.model = model;
     	
+    	this.loadTableGroupRentals();
+    }
+    
+    
+    public void setStage(Stage stage) {
+    	this.stage = stage;
+    }
+    
+    
+    private void loadTableGroupRentals() {
+    	this.tableRentals.getColumns().clear();
+    	this.tableRentals.getItems().clear();
     	
     	List<GroupRentals> groupRentals = RentalsDAO.getGroupRentals();
     	
@@ -184,10 +204,5 @@ public class RentalsDataController {
     	this.tableRentals.getColumns().add(numColumn);
     	
     	this.tableRentals.getItems().addAll(groupRentals);
-    }
-    
-    
-    public void setStage(Stage stage) {
-    	this.stage = stage;
     }
 }

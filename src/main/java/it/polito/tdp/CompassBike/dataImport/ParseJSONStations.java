@@ -105,11 +105,6 @@ public class ParseJSONStations {
 		
 		this.correctLine = stations.size();
 		this.errorLine = errorLine;
-		
-		System.out.println("Sono state lette correttamente "+stations.size()+" righe!");
-    	System.out.println(errorLine+" righe contengono uno o più errori di formato!");
-    	Double percentage = ((double) stations.size()) / (stations.size() + errorLine) * 100.0;
-    	System.out.println(String.format("Verrà quindi salvato circa il %.2f%% del file\n", percentage));
 	    
 	    return stations;
 	}

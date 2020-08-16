@@ -109,6 +109,55 @@ public class StationsDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	/**
+	 * Permette di eliminare una stazione inserita manualmente dall'utente dal db.
+	 *  
+	 * @param station La {@link Station stazione} da eliminare.
+	 */
+	public static void deleteStationUser(Station station) {
+		String sql = "DELETE FROM stations WHERE station_id = ?";
+		Connection conn = DBConnect.getConnection();
+		
+	    try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, station.getId());
+
+			st.execute();
+
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * Permette di aggiornare i parametri di una stazione
+	 *  
+	 * @param station La {@link Station stazione} a cui modificare i parametri.
+	 */
+	public static void updateStation(Station station) {
+		String sql = "UPDATE stations SET num_docks = ?, num_bikes = ? WHERE station_id = ?";
+		Connection conn = DBConnect.getConnection();
+		
+	    try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, station.getNumDocks());
+			st.setInt(2, station.getNumBikes());
+			
+			st.setInt(3, station.getId());
+
+			st.execute();
+
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	
 	/**
@@ -120,6 +169,38 @@ public class StationsDAO {
 		String sql = "SELECT * " +
 				"FROM stations " + 
 				"WHERE installed = 1 " +
+				"ORDER BY station_id";
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				Station station = new Station(res.getInt("station_id"), res.getString("common_name"),
+						res.getInt("num_bikes"), res.getInt("num_empty_docks"), res.getInt("num_docks"), res.getDouble("latitude"), res.getDouble("longitude"));
+				
+				result.put(station.getId(), station);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Permette di ottenere tutte le stazioni inserite manualmente dall'utente attualmente memorizzate nel db, sotto forma di mappa.
+	 * @return La {@link Map mappa} con l'ID come chiave e l'oggetto {@link StationData stazione} come valore.
+	 */
+	public static Map<Integer, Station> getAllStationsUser() {
+		Map<Integer, Station> result = new HashMap<>();
+		String sql = "SELECT * " +
+				"FROM stations " + 
+				"WHERE installed = 1 AND station_id > 9000 " +
 				"ORDER BY station_id";
 		
 		Connection conn = DBConnect.getConnection();

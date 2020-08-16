@@ -9,12 +9,16 @@ import it.polito.tdp.CompassBike.model.Station;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -27,8 +31,6 @@ public class StationsDataController {
 	private Model model;
 	private Stage stage;
 	
-	private boolean gridAddStationIsVisible = false;
-
 	@FXML
     private ResourceBundle resources;
 
@@ -57,10 +59,7 @@ public class StationsDataController {
     private Label lblResultFileStations;
 
     @FXML
-    private JFXButton btnShowGridAddStation;
-
-    @FXML
-    private Label lblMessageAddStation;
+    private JFXButton btnShowMap;
 
     @FXML
     private GridPane gridAddStation;
@@ -91,11 +90,37 @@ public class StationsDataController {
 
     @FXML
     private JFXButton btnClearGridStation;
+
+    @FXML
+    private TextField txtDocksChange;
+
+    @FXML
+    private TextField txtBikesChange;
+
+    @FXML
+    private JFXButton btnChangeStation;
+
+    @FXML
+    private ComboBox<Station> cmdChangeStation;
+
+    @FXML
+    private Label lblErrorChangeStation;
+
+    @FXML
+    private JFXButton btnDeleteStation;
+
+    @FXML
+    private ComboBox<Station> cmdDeleteStation;
+
+    @FXML
+    private Label lblErrorDeleteStation;
     
 
     
     @FXML
     void doLoadStations(ActionEvent event) {
+    	this.clearLblError();
+    	
     	FileChooser fileChooser = new FileChooser();
     	fileChooser.setTitle("Importa stazioni");
     	FileChooser.ExtensionFilter extentionFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
@@ -120,17 +145,24 @@ public class StationsDataController {
 			} else {
 				Integer correctLine = res[1];
 				Integer errorLine = res[2];
-				Double percentage = ((double) correctLine) / (correctLine + errorLine) * 100.0;
-				textLbl = String.format("E' stato salvato il %.1f%% del file, in quanto %d righe contengono errori di formato.", percentage, errorLine);
+				if(errorLine > 0) {
+					Double percentage = ((double) correctLine) / (correctLine + errorLine) * 100.0;
+					textLbl = String.format("E' stato salvato il %.1f%% del file, in quanto %d righe contenevano errori di formato.", percentage, errorLine);
+				} else {
+					textLbl = String.format("E' stato salvato il 100%% del file, il file non conteneva errori di formato.");
+				}
 			}
 			this.lblResultFileStations.setText(textLbl);
 		}
-			
+		
+		this.loadCmdStations();
     }
     
     
     @FXML
     void doAddStation(ActionEvent event) {
+    	this.clearLblError();
+    	
     	String sId = txtId.getText();
     	if(sId == null) {
     		this.lblErrorAddStation.setText("Si prega di inserire l'ID della stazione.");
@@ -145,7 +177,7 @@ public class StationsDataController {
     	}
     	
     	if(id <= 9000) {
-    		this.lblErrorAddStation.setText("Per motivi applicativi le stazioni inserite manualmente dall'utente devono avere un ID maggiore di 9000.\nNon è possibile modificare i parametri di stazioni non inserite manualmente dall'utente.");
+    		this.lblErrorAddStation.setText("Per motivi applicativi le stazioni inserite manualmente dall'utente devono avere un ID maggiore di 9000.");
     		return;
     	}
     	
@@ -223,6 +255,7 @@ public class StationsDataController {
     	StationsDAO.addStationUser(station);
     	this.lblErrorAddStation.setText("Stazione inserita correttamente.");
     	this.clearGrid();
+    	this.loadCmdStations();
     }
     
 
@@ -230,6 +263,7 @@ public class StationsDataController {
     void doClearGridAddStation(ActionEvent event) {
     	this.clearGrid();
     	this.lblErrorAddStation.setText("");
+    	this.clearLblError();
     }
     
     
@@ -291,14 +325,97 @@ public class StationsDataController {
     
 
     @FXML
-    void showGridAddStation(ActionEvent event) {
-    	this.gridAddStationIsVisible = !this.gridAddStationIsVisible;
+    void doChangeStation(ActionEvent event) {
+    	this.clearLblError();
     	
-    	this.gridAddStation.setManaged(this.gridAddStationIsVisible);
-    	this.gridAddStation.setVisible(this.gridAddStationIsVisible);
+    	Station selectedStation = this.cmdChangeStation.getValue();
+    	if(selectedStation == null) {
+    		this.lblErrorChangeStation.setText("Si prega di selezionare una stazione.");
+    		return;
+    	}
     	
-    	this.lblMessageAddStation.setVisible(this.gridAddStationIsVisible);
+    	String docks = txtDocksChange.getText();
+    	if(docks == null) {
+    		this.lblErrorChangeStation.setText("Si prega di inserire il numero di docks (colonnine) della stazione.");
+    		return;
+    	}
+    	Integer numDocks = null;
+    	try {
+    		numDocks = Integer.parseInt(docks);
+    	} catch(NumberFormatException e) {
+    		this.lblErrorChangeStation.setText("Il numero di docks deve essere un numero intero!");
+    		return;
+    	}
+    	
+    	String bikes = txtBikesChange.getText();
+    	if(bikes == null) {
+    		this.lblErrorChangeStation.setText("Si prega di inserire il numero di bici della stazione.");
+    		return;
+    	}
+    	Integer numBikes = null;
+    	try {
+    		numBikes = Integer.parseInt(bikes);
+    	} catch(NumberFormatException e) {
+    		this.lblErrorChangeStation.setText("Il numero di bici deve essere un numero intero!");
+    		return;
+    	}
+    	
+    	if(numBikes > numDocks) {
+    		this.lblErrorChangeStation.setText("Il numero di bici deve essere minore o uguale del numero di docks!");
+    		return;
+    	}
+    	
+    	if(numBikes == selectedStation.getNumBikes() && numDocks == selectedStation.getNumDocks()) {
+    		this.lblErrorChangeStation.setText("Si prega di modificare i parametri.");
+    		return;
+    	}
+    	
+    	selectedStation.setNumDocks(numDocks);
+    	selectedStation.setNumBikes(numBikes);
+    	StationsDAO.updateStation(selectedStation);
+    	this.lblErrorChangeStation.setText("Stazione modificata correttamente.");
+    	
+    	this.txtDocksChange.clear();
+    	this.txtBikesChange.clear();
+    	
+    	this.loadCmdStations();
+    	this.cmdChangeStation.setValue(null);
     }
+    
+
+    @FXML
+    void doDeleteStation(ActionEvent event) {
+    	this.clearLblError();
+    	
+    	Station selectedStation = this.cmdDeleteStation.getValue();
+    	if(selectedStation == null) {
+    		this.lblErrorDeleteStation.setText("Si prega di selezionare una stazione.");
+    		return;
+    	}
+    	
+    	StationsDAO.deleteStationUser(selectedStation);
+    	this.lblErrorDeleteStation.setText("Stazione eliminata correttamente.");
+    	
+    	this.loadCmdStations();
+    	this.cmdDeleteStation.setValue(null);
+    }
+    
+
+    @FXML
+    void doLoadChangeStation(ActionEvent event) {
+    	Station selectedStation = this.cmdChangeStation.getValue();
+    	if(selectedStation != null) {
+    		this.txtDocksChange.setText(selectedStation.getNumDocks().toString());
+    		this.txtBikesChange.setText(selectedStation.getNumBikes().toString());
+    	}
+    }
+    
+
+    @FXML
+    void doShowMap(ActionEvent event) {
+    	// TODO Creare e aprire la mappa
+    }
+    
 
     @FXML
     void initialize() {
@@ -309,8 +426,7 @@ public class StationsDataController {
         assert lblNumStations != null : "fx:id=\"lblNumStations\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnFileStations != null : "fx:id=\"btnFileStations\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert lblResultFileStations != null : "fx:id=\"lblResultFileStations\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
-        assert btnShowGridAddStation != null : "fx:id=\"btnShowGridAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
-        assert lblMessageAddStation != null : "fx:id=\"lblMessageAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert btnShowMap != null : "fx:id=\"btnShowMap\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert gridAddStation != null : "fx:id=\"gridAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtId != null : "fx:id=\"txtId\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtName != null : "fx:id=\"txtName\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
@@ -321,8 +437,14 @@ public class StationsDataController {
         assert lblErrorAddStation != null : "fx:id=\"lblErrorAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnAddStation != null : "fx:id=\"btnAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnClearGridStation != null : "fx:id=\"btnClearGridStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
-        
-        this.gridAddStation.setManaged(false);
+        assert txtDocksChange != null : "fx:id=\"txtDocksChange\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert txtBikesChange != null : "fx:id=\"txtBikesChange\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert btnChangeStation != null : "fx:id=\"btnChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert cmdChangeStation != null : "fx:id=\"cmdChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert lblErrorChangeStation != null : "fx:id=\"lblErrorChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert btnDeleteStation != null : "fx:id=\"btnDeleteStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert cmdDeleteStation != null : "fx:id=\"cmdDeleteStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
+        assert lblErrorDeleteStation != null : "fx:id=\"lblErrorDeleteStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
     }
     
     
@@ -332,8 +454,9 @@ public class StationsDataController {
     	Integer numStations = StationsDAO.getNumStations();
     	this.lblNumStations.setText("Il database contiene "+numStations+" stazioni.");
     	
-    	Integer id = StationsDAO.getLastIdUserStation() + 1;
-    	this.txtId.setText(id.toString());
+    	this.setIdUserStation();
+    	
+    	this.loadCmdStations();
     }
     
     
@@ -348,5 +471,31 @@ public class StationsDataController {
     	this.txtBikes.clear();
     	this.txtLat.clear();
     	this.txtLon.clear();
+    }
+    
+    private void setIdUserStation() {
+    	Integer id = StationsDAO.getLastIdUserStation() + 1;
+    	this.txtId.setText(id.toString());
+    }
+    
+    
+    private void loadCmdStations() {
+    	Map<Integer, Station> stations = StationsDAO.getAllStations();
+    	List<Station> list = new ArrayList<>(stations.values());
+    	list.sort(null);
+    	this.cmdChangeStation.getItems().setAll(list);
+    	
+    	Map<Integer, Station> stationsUser = StationsDAO.getAllStationsUser();
+    	List<Station> listUser = new ArrayList<>(stationsUser.values());
+    	listUser.sort(null);
+    	this.cmdDeleteStation.getItems().setAll(listUser);
+    }
+    
+    
+    private void clearLblError() {
+    	this.lblResultFileStations.setText("");
+    	this.lblErrorAddStation.setText("");
+    	this.lblErrorChangeStation.setText("");
+    	this.lblErrorDeleteStation.setText("");
     }
 }
