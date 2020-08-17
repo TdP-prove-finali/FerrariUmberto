@@ -2,195 +2,231 @@ package it.polito.tdp.CompassBike;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXRadioButton;
+import com.jfoenix.controls.JFXToggleButton;
 
-import it.polito.tdp.CompassBike.DAO.BikesDAO;
-import it.polito.tdp.CompassBike.DAO.RentalsDAO;
-import it.polito.tdp.CompassBike.model.GroupRentals;
 import it.polito.tdp.CompassBike.model.Model;
+import it.polito.tdp.CompassBike.model.Simulator.RedistributionType;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class SimulationController {
 	
-	// TODO Da fare molto meglio, ci sono molte parti di codice copiate più volte
-	
-	// TODO Spostare il codice di Group Rentals nel model, anche per Result
-	
-	// TODO Da mettere il settaggio dei parametri numerici
-	
 	private Model model;
 	private Stage stage;
 	
-	private List<GroupRentals> groups;
-	
+	private Integer numBikesDB;
 	private Integer numMaxBikes;
+	
+	
+	private LocalDate startDate;
+	private LocalDate endDate;
+	
+	private LocalDate startDateData;
+	private LocalDate endDateData;
+	
+	private Double variation;
+	private Double probability;
+	private Integer numBikes;
+	
+	private final Double DEFAULT_VARIATION = 0.0;
+	private final Double DEFAULT_PROBABILITY = 60.0;
+	
+	
+	@FXML
+	private ResourceBundle resources;
 
 	@FXML
-    private ResourceBundle resources;
+	private URL location;
+
+	@FXML
+	private JFXButton btnStationsData;
+
+	@FXML
+	private JFXButton btnRentalsData;
+
+	@FXML
+	private JFXButton btnSimulation;
+
+	@FXML
+	private JFXButton btnResult;
+
+	@FXML
+	private Label lblErrorSimulator;
+	
+	@FXML
+    private GridPane gridDateData;
+
+	@FXML
+	private DatePicker dateStartSimulation;
+
+	@FXML
+	private DatePicker dateEndSimulation;
+
+	@FXML
+	private JFXRadioButton radioMonth;
+
+	@FXML
+	private ToggleGroup radioDateData;
+
+	@FXML
+	private JFXRadioButton radioYear;
+
+	@FXML
+	private JFXRadioButton radioManual;
+
+	@FXML
+	private HBox hBoxManual;
+
+	@FXML
+	private DatePicker dateStartData;
+
+	@FXML
+	private DatePicker dateEndData;
+
+	@FXML
+	private Label lblErrorData;
+
+	@FXML
+	private TextField txtVariation;
+
+	@FXML
+	private TextField txtProbabilityNewStation;
+
+	@FXML
+	private Label lblErrorParameters;
+
+	@FXML
+	private JFXToggleButton toggleRedistribution;
+
+	@FXML
+    private JFXRadioButton radioUniform;
 
     @FXML
-    private URL location;
+    private ToggleGroup radioRedistribution;
 
     @FXML
-    private JFXButton btnStationsData;
+    private JFXRadioButton radioToCenter;
 
     @FXML
-    private JFXButton btnRentalsData;
+    private JFXRadioButton radioFromCenter;
+	
+	@FXML
+	private HBox hBoxRedistribution;
+
+	@FXML
+	private TextField txtNumBikes;
+
+	@FXML
+	private Label lblErrorBike;
+
+	@FXML
+	private Label lblMaxBikes;
+
+	@FXML
+	private JFXButton btnClear;
+
+	@FXML
+	private JFXButton btnPlaySimulation;
+	
+	@FXML
+	private Label lblIncompleteData;
+	
 
     @FXML
-    private JFXButton btnSimulation;
-
-    @FXML
-    private JFXButton btnResult;
-
-    @FXML
-    private Label lblErrorSimulator;
-
-    @FXML
-    private DatePicker dateStartSimulation;
-
-    @FXML
-    private DatePicker dateEndSimulation;
-    
-    @FXML
-    private JFXRadioButton radioMonth;
-
-    @FXML
-    private JFXRadioButton radioYear;
-
-    @FXML
-    private JFXRadioButton radioManual;
-
-    @FXML
-    private ToggleGroup radioDateData;
-
-    @FXML
-    private HBox hBoxManual;
-
-    @FXML
-    private DatePicker dateStartData;
-
-    @FXML
-    private DatePicker dateEndData;
-
-    @FXML
-    private Label lblErrorData;
-
-    @FXML
-    private TextField txtNumBikes;
-
-    @FXML
-    private Label lblErrorBike;
-
-    @FXML
-    private JFXButton btnClear;
-
-    @FXML
-    private JFXButton btnPlaySimulation;
-    
-    @FXML
-    private Label lblMaxBikes;
-    
-    
-    @FXML
-    void doClear(ActionEvent event) {
-    	this.dateStartSimulation.getEditor().clear();
+    void doClear(ActionEvent event) {    	
     	this.dateStartSimulation.setValue(null);
-    	this.dateEndSimulation.getEditor().clear();
     	this.dateEndSimulation.setValue(null);
     	
-    	if(this.radioDateData.getSelectedToggle() != null)
-    		this.radioDateData.getSelectedToggle().setSelected(false);
+    	this.clearGridDateData();
     	
-    	this.hBoxManual.setVisible(false);
+    	if(this.radioRedistribution.getSelectedToggle() != null)
+    		this.radioRedistribution.getSelectedToggle().setSelected(false);
     	
-    	this.dateStartData.getEditor().clear();
-    	this.dateStartData.setValue(null);
-    	this.dateEndData.getEditor().clear();
-    	this.dateEndData.setValue(null);
+    	this.toggleRedistribution.setSelected(false);
+    	this.hBoxRedistribution.setVisible(false);
+    	
+    	this.lblIncompleteData.setVisible(false);
+
     	
     	this.loadNumBikes();
     }
 
     @FXML
-    void doSimulation(ActionEvent event) {
-    	LocalDate startDate = this.dateStartSimulation.getValue();
-    	LocalDate endDate = this.dateEndSimulation.getValue();
-    	
-    	LocalDate startDateData = null;
-    	LocalDate endDateData = null;
-    	
-    	if(this.radioDateData.getSelectedToggle() == null) {
-    		this.lblErrorData.setText("Selezionare una alternativa");
+    void doSimulation(ActionEvent event) throws Exception {
+    	if(!this.checkNumBikes(event) || !this.checkParameters(event)) {
     		return;
     	}
     	
-    	if(this.radioYear.isSelected()) {
-    		startDateData = startDate.minus(1, ChronoUnit.YEARS);
-    		endDateData = endDate.minus(1, ChronoUnit.YEARS);
-    		
-    		if(this.isDataAvaiable(startDateData, endDateData)) {
-    			this.model.setParametersSimulation(startDateData, endDateData, 10.0);
-    			this.model.runSimulation();
-    			try {
-					this.goToResult(new ActionEvent());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+    	if(this.startDate == null || this.endDate == null || this.startDateData == null || this.endDateData == null || this.variation == null || this.probability == null || this.numBikes == null) {
+    		this.lblIncompleteData.setVisible(true);
+    		this.btnPlaySimulation.setDisable(true);
+    		return;
+    	}
+    	
+    	this.lblIncompleteData.setVisible(false);
+    	
+    	model.setParametersSimulation(startDateData, endDateData, variation, startDate, endDate);
+	    model.setProbabilityNewStartStation(probability);
+	    
+	    if(this.toggleRedistribution.isSelected()) {
+	    	if(this.radioRedistribution.getSelectedToggle() != null) {
+	    		if(this.radioUniform.isSelected())
+	    			this.model.setRedistribution(RedistributionType.UNIFORME);
+	    		else if(this.radioFromCenter.isSelected())
+	    			this.model.setRedistribution(RedistributionType.VERSO_PERIFERIA);
+	    		else if(this.radioToCenter.isSelected())
+	    			this.model.setRedistribution(RedistributionType.VERSO_CENTRO);
+	    	} else {
+	    		this.lblIncompleteData.setVisible(true);
+	    		this.btnPlaySimulation.setDisable(true);
+	    		return;
+	    	}
+	    } else {
+	    	this.model.setRedistribution(RedistributionType.NESSUNO);
+	    }
+	    
+	    this.model.setNumBikes(this.numBikes);
+	    
+		model.runSimulation();
+
+		
+		ChangePage.goToResult(this.stage, this.model);
+    }
+    
+    
+    @FXML
+    void checkDateSimulation(ActionEvent event) {
+    	this.btnPlaySimulation.setDisable(false);
+    	this.gridDateData.setDisable(true);
+    	this.lblErrorSimulator.setText("");
+    	
+    	
+    	this.startDate = this.dateStartSimulation.getValue();
+    	this.endDate = this.dateEndSimulation.getValue();
+    	
+    	if(this.startDate != null && this.endDate != null) {
+    		if(this.startDate.isAfter(this.endDate)) {
+    			this.lblErrorSimulator.setText("La data di inizio non può essere successiva a quella di fine.");
+    			this.btnPlaySimulation.setDisable(true);
     		} else {
-    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
+    			this.gridDateData.setDisable(false);
     		}
-    	} else if(this.radioMonth.isSelected()) {
-    		startDateData = startDate.minus(1, ChronoUnit.MONTHS);
-    		endDateData = endDate.minus(1, ChronoUnit.MONTHS);
     		
-    		if(this.isDataAvaiable(startDateData, endDateData)) {
-    			this.model.setParametersSimulation(startDateData, endDateData, 10.0);
-    			this.model.runSimulation();
-    			try {
-					this.goToResult(new ActionEvent());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-    		} else {
-    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
-    		}
-    	} else if(this.radioManual.isSelected()) {
-    		startDateData = this.dateStartData.getValue();
-    		endDateData = this.dateEndData.getValue();
-    		
-    		if(startDateData != null && endDateData != null) {
-	    		if(startDateData.isAfter(endDateData)) {
-	    			this.lblErrorData.setText("La data di inizio non può essere successiva a quella di fine.");
-	    			return;
-	    		}
-	    		
-	    		if(this.isDataAvaiable(startDateData, endDateData)) {
-	    			this.model.setParametersSimulation(startDateData, endDateData, 10.0);
-	    			this.model.runSimulation();
-	    			try {
-						this.goToResult(new ActionEvent());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-	    		} else {
-	    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
-	    		}
+    		if(this.startDateData != null || this.endDateData != null) {
+    			this.clearGridDateData();
     		}
     	}
     }
@@ -199,183 +235,170 @@ public class SimulationController {
     @FXML
     void showHBoxData(ActionEvent event) {
     	this.btnPlaySimulation.setDisable(false);
+    	this.lblErrorData.setText("");
     	
     	this.hBoxManual.setVisible(true);
-    	
-    	this.lblErrorData.setText("");
-    }
-    
-    
-    @FXML
-    void checkDateData(ActionEvent event) {
-    	this.btnPlaySimulation.setDisable(false);
-    	
-    	LocalDate startDate = this.dateStartSimulation.getValue();
-    	LocalDate endDate = this.dateEndSimulation.getValue();
-    	if(startDate != null && endDate != null) {
-    		LocalDate startDateData = this.dateStartData.getValue();
-    		LocalDate endDateData = this.dateEndData.getValue();
-    		
-    		if(startDateData != null && endDateData != null) {
-	    		if(startDateData.isAfter(endDateData)) {
-	    			this.lblErrorData.setText("La data di inizio non può essere successiva a quella di fine.");
-	    			this.btnPlaySimulation.setDisable(true);
-	    			return;
-	    		}
-	    		
-	    		if(!this.isDataAvaiable(startDateData, endDateData)) {
-	    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
-	    			this.btnPlaySimulation.setDisable(true);
-	    		}
-    		}
-    	}
     }
     
     
     @FXML
     void hideHBoxDataMonth(ActionEvent event) {
     	this.btnPlaySimulation.setDisable(false);
-    	
-    	this.hBoxManual.setVisible(false);
-    	this.dateStartData.getEditor().clear();
-    	this.dateStartData.setValue(null);
-    	this.dateEndData.getEditor().clear();
-    	this.dateEndData.setValue(null);
-    	
     	this.lblErrorData.setText("");
     	
-    	LocalDate startDate = this.dateStartSimulation.getValue();
-    	LocalDate endDate = this.dateEndSimulation.getValue();
-    	if(startDate != null && endDate != null) {
-    		LocalDate startDateData = startDate.minus(1, ChronoUnit.MONTHS);
-    		LocalDate endDateData = endDate.minus(1, ChronoUnit.MONTHS);
-    		
-    		if(!this.isDataAvaiable(startDateData, endDateData)) {
-    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
-    			this.btnPlaySimulation.setDisable(true);
-    		}
-    	}
+    	this.hBoxManual.setVisible(false);
+    	this.dateStartData.setValue(null);
+    	this.dateEndData.setValue(null);
+    	
+
+    	this.startDateData = startDate.minus(1, ChronoUnit.MONTHS);
+		this.endDateData = endDate.minus(1, ChronoUnit.MONTHS);
+		
+		if(!this.model.isDataAvaiable(startDateData, endDateData)) {
+			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
+			this.btnPlaySimulation.setDisable(true);
+		}
     }
     
     
     @FXML
     void hideHBoxDataYear(ActionEvent event) {
     	this.btnPlaySimulation.setDisable(false);
-    	
-    	this.hBoxManual.setVisible(false);
-    	
     	this.lblErrorData.setText("");
     	
-    	LocalDate startDate = this.dateStartSimulation.getValue();
-    	LocalDate endDate = this.dateEndSimulation.getValue();
-    	if(startDate != null && endDate != null) {
-    		LocalDate startDateData = startDate.minus(1, ChronoUnit.YEARS);
-    		LocalDate endDateData = endDate.minus(1, ChronoUnit.YEARS);
-    		
-    		if(!this.isDataAvaiable(startDateData, endDateData)) {
-    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
-    			this.btnPlaySimulation.setDisable(true);
-    		}
-    	}
+    	this.hBoxManual.setVisible(false);
+    	this.dateStartData.setValue(null);
+    	this.dateEndData.setValue(null);
+    	
+    	
+    	this.startDateData = startDate.minus(1, ChronoUnit.YEARS);
+		this.endDateData = endDate.minus(1, ChronoUnit.YEARS);
+		
+		if(!this.model.isDataAvaiable(startDateData, endDateData)) {
+			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
+			this.btnPlaySimulation.setDisable(true);
+		}
     }
     
     
     @FXML
-    void checkDateSimulation(ActionEvent event) {
+    void checkDateData(ActionEvent event) {
     	this.btnPlaySimulation.setDisable(false);
+    	this.lblErrorData.setText("");
+
     	
-    	LocalDate startDate = this.dateStartSimulation.getValue();
-    	LocalDate endDate = this.dateEndSimulation.getValue();
-    	if(startDate != null && endDate != null) {
-    		if(startDate.isAfter(endDate)) {
-    			this.lblErrorSimulator.setText("La data di inizio non può essere successiva a quella di fine.");
+    	this.startDateData = this.dateStartData.getValue();
+    	this.endDateData = this.dateEndData.getValue();
+    		
+    	if(startDateData != null && endDateData != null) {
+    		if(startDateData.isAfter(endDateData)) {
+    			this.lblErrorData.setText("La data di inizio non può essere successiva a quella di fine.");
     			this.btnPlaySimulation.setDisable(true);
     			return;
     		}
+    		
+    		if(ChronoUnit.DAYS.between(startDate, endDate) != ChronoUnit.DAYS.between(startDateData, endDateData)) {
+    			this.lblErrorData.setText("L'ampiezza dei due intervalli deve essere uguale.");
+    			this.btnPlaySimulation.setDisable(true);
+    			return;
+    		}
+    		
+    		if(!this.model.isDataAvaiable(startDateData, endDateData)) {
+    			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
+    			this.btnPlaySimulation.setDisable(true);
+    		}
+		}
+    }
+    
+    
+    @FXML
+    boolean checkParameters(ActionEvent event) {
+    	this.lblErrorParameters.setText("");
+    	
+    	String var = this.txtVariation.getText();
+    	this.variation = null;
+    	try {
+    		this.variation = Double.parseDouble(var);
+    	} catch(NumberFormatException e) {
+    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di 0.0%.");
+    		return false;
     	}
+    	
+    	if(variation < 0.0) {
+    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di 0.0%.");
+    		return false;
+    	}
+    	
+    	
+    	String prob = this.txtProbabilityNewStation.getText();
+    	this.probability = null;
+    	try {
+    		this.probability = Double.parseDouble(prob);
+    	} catch(NumberFormatException e) {
+    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 5.0% e 100.0%.");
+    		return false;
+    	}
+    	
+    	if(probability < 5.0 || probability > 100.0) {
+    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 5.0% e 100.0%.");
+    		return false;
+    	}
+    	
+    	return true;
     }
     
 
     @FXML
-    void checkNumBikes(ActionEvent event) {
-    	this.btnPlaySimulation.setDisable(true);
+    boolean checkNumBikes(ActionEvent event) {
+    	this.lblErrorBike.setText("");
     	
     	String bikes = this.txtNumBikes.getText();
-    	Integer numBikes = null;
+    	this.numBikes = null;
     	try {
-    		numBikes = Integer.parseInt(bikes);
+    		this.numBikes = Integer.parseInt(bikes);
     	} catch(NumberFormatException e) {
     		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero!");
-    		this.btnPlaySimulation.setDisable(true);
-    		return;
+    		return false;
     	}
     	
     	if(numBikes <= 0) {
     		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero positivo e maggiore di 0!");
-    		this.btnPlaySimulation.setDisable(true);
-    		return;
+    		return false;
     	}
     	
     	if(numBikes > this.numMaxBikes) {
     		this.lblErrorBike.setText("Il numero inserito è maggiore del numero massimo di biciclette utilizzabili!");
-    		this.btnPlaySimulation.setDisable(true);
-    		return;
+    		return false;
     	}
+    	
+    	return true;
     }
     
+    @FXML
+    void showHBoxRedistribution(ActionEvent event) {
+    	if(this.toggleRedistribution.isSelected()) {
+            this.radioUniform.setSelected(true);
+    		this.hBoxRedistribution.setVisible(true);
+    	} else {
+    		if(this.radioRedistribution.getSelectedToggle() != null)
+        		this.radioRedistribution.getSelectedToggle().setSelected(false);
+    		this.hBoxRedistribution.setVisible(false);
+    	}
+    }
 
     @FXML
     void goToRentalsData(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RentalsDataImport.fxml"));
-        BorderPane root = loader.load();
-		
-        RentalsDataController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Dati noleggi");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToRentalsData(this.stage, this.model);
     }
 
     @FXML
     void goToResult(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResultScene.fxml"));
-        BorderPane root = loader.load();
-		
-        ResultController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Risultati");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToResult(this.stage, this.model);
     }
 
     @FXML
     void goToStationsData(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/StationsDataImport.fxml"));
-        BorderPane root = loader.load();
-		
-        StationsDataController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Dati stazioni");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToStationsData(this.stage, this.model);
     }
 
     @FXML
@@ -387,6 +410,7 @@ public class SimulationController {
         assert lblErrorSimulator != null : "fx:id=\"lblErrorSimulator\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert dateStartSimulation != null : "fx:id=\"dateStartSimulation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert dateEndSimulation != null : "fx:id=\"dateEndSimulation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert gridDateData != null : "fx:id=\"gridDateData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert radioMonth != null : "fx:id=\"radioMonth\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert radioDateData != null : "fx:id=\"radioDateData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert radioYear != null : "fx:id=\"radioYear\" was not injected: check your FXML file 'SimulationScene.fxml'.";
@@ -395,27 +419,51 @@ public class SimulationController {
         assert dateStartData != null : "fx:id=\"dateStartData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert dateEndData != null : "fx:id=\"dateEndData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblErrorData != null : "fx:id=\"lblErrorData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert txtVariation != null : "fx:id=\"txtVariation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert txtProbabilityNewStation != null : "fx:id=\"txtProbabilityNewStation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert lblErrorParameters != null : "fx:id=\"lblErrorParameters\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert toggleRedistribution != null : "fx:id=\"toggleRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert hBoxRedistribution != null : "fx:id=\"hBoxRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert radioUniform != null : "fx:id=\"radioUniform\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert radioRedistribution != null : "fx:id=\"radioRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert radioToCenter != null : "fx:id=\"radioToCenter\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert radioFromCenter != null : "fx:id=\"radioFromCenter\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert txtNumBikes != null : "fx:id=\"txtNumBikes\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblErrorBike != null : "fx:id=\"lblErrorBike\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblMaxBikes != null : "fx:id=\"lblMaxBikes\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert btnClear != null : "fx:id=\"btnClear\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert btnPlaySimulation != null : "fx:id=\"btnPlaySimulation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
+        assert lblIncompleteData != null : "fx:id=\"lblIncompleteData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
 
+        this.hBoxManual.setVisible(false);
+        this.hBoxRedistribution.setVisible(false);
+        
+        this.gridDateData.setDisable(true);
+        
+        this.dateStartSimulation.getEditor().setDisable(true);
+        this.dateEndSimulation.getEditor().setDisable(true);
+        this.dateStartData.getEditor().setDisable(true);
+        this.dateEndData.getEditor().setDisable(true);
+        
+        this.txtVariation.setText(this.DEFAULT_VARIATION.toString());
+        this.txtProbabilityNewStation.setText(this.DEFAULT_PROBABILITY.toString());
+        
+        this.lblIncompleteData.setVisible(false);
     }
     
     
     public void setModel(Model model) {
     	this.model = model;
     	
+    	this.numBikesDB = this.model.getNumBikesDB();
     	this.loadNumBikes();
-    	this.numMaxBikes = BikesDAO.getNumDocks();
-    	this.lblMaxBikes.setText("Il numero massimo di biciclette utilizzabili è "+numMaxBikes+" (pari al numero di colonnine).");
     	
-    	this.groups = RentalsDAO.getGroupRentals();
+    	this.numMaxBikes = this.model.getNumDocks();
+    	this.lblMaxBikes.setText("Il numero massimo di biciclette utilizzabili è "+this.numMaxBikes+" (pari al numero di colonnine).");
     	
-    	this.hBoxManual.setVisible(false);
-    	
-    	
+    	this.numBikes = this.numBikesDB;
+    	this.variation = this.DEFAULT_VARIATION;
+    	this.probability = this.DEFAULT_PROBABILITY;
     }
     
     
@@ -425,19 +473,25 @@ public class SimulationController {
     
     
     private void loadNumBikes() {
-    	Integer numBikes = BikesDAO.getNumBike();
-    	this.txtNumBikes.setText(numBikes.toString());
+    	if(this.numBikesDB == null)
+    		System.out.println("NULL NULL");
+    	this.txtNumBikes.setText(this.numBikesDB.toString());
     }
     
     
-    private boolean isDataAvaiable(LocalDate start, LocalDate end) {
-    	for(GroupRentals group : this.groups) {
-    		LocalDate from = group.getFromDate();
-    		LocalDate to = group.getToDate();
-    		if((from.isBefore(start) || from.equals(start)) && (from.isBefore(end) || from.equals(end)) && (to.isAfter(start) || to.equals(start)) && (to.isAfter(end) || to.equals(end)))
-    			return true;
-    	}
+    private void clearGridDateData() {
+    	if(this.radioDateData.getSelectedToggle() != null)
+    		this.radioDateData.getSelectedToggle().setSelected(false);
     	
-    	return false;
+    	this.lblErrorData.setText("");
+    	
+    	this.hBoxManual.setVisible(false);
+    	
+    	this.dateStartData.setValue(null);
+    	this.dateEndData.setValue(null);
+    	
+    	this.startDateData = null;
+    	this.endDateData = null;
     }
+    
 }

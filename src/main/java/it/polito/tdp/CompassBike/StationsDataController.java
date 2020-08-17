@@ -18,12 +18,9 @@ import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -128,12 +125,20 @@ public class StationsDataController {
     	FileChooser.ExtensionFilter extentionFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
 		fileChooser.getExtensionFilters().add(extentionFilter);
 		
+		Stage loadingStage = null;
+		try {
+			loadingStage = ChangePage.loadingScreen();
+		} catch (Exception e) {}
+		
     	Stage newStage = new Stage();
 		File selectedFile = fileChooser.showOpenDialog(newStage);
 		newStage.close();
 		
 		if(selectedFile != null) {
 			Integer[] res = DataImport.parseJSONStations(selectedFile);
+			
+			ChangePage.closeLoadingScreen(loadingStage);
+			
 			String textLbl = "";
 			if(res[0] != 0) {
 				switch(res[0]) {
@@ -153,11 +158,14 @@ public class StationsDataController {
 				} else {
 					textLbl = String.format("E' stato salvato il 100%% del file, il file non conteneva errori di formato.");
 				}
+				this.loadCmdStations();
 			}
 			this.lblResultFileStations.setText(textLbl);
+		} else {
+			ChangePage.closeLoadingScreen(loadingStage);
 		}
 		
-		this.loadCmdStations();
+		
     }
     
     
@@ -271,58 +279,19 @@ public class StationsDataController {
     
     @FXML
     void goToRentalsData(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RentalsDataImport.fxml"));
-        BorderPane root = loader.load();
-		
-        RentalsDataController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Dati noleggi");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToRentalsData(this.stage, this.model);
     }
     
 
     @FXML
     void goToResult(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResultScene.fxml"));
-        BorderPane root = loader.load();
-		
-        ResultController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Risultati");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToResult(this.stage, this.model);
     }
     
 
     @FXML
     void goToSimulation(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SimulationScene.fxml"));
-        BorderPane root = loader.load();
-		
-        SimulationController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Simulazione");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToSimulation(this.stage, this.model);
     }
     
 

@@ -30,7 +30,17 @@
 	-fx-cursor: hand;
 }
 
+.jradiobutton {
+	-fx-font-size: 14px;
+	-jfx-selected-color:  #F1B434;
+}
+
 #tableRentals .table-column {
   -fx-alignment: CENTER;
-  -fx-font-size:13px;
+  -fx-font-size: 13px;
+}
+
+#tableStations .table-column {
+  -fx-alignment: CENTER;
+  -fx-font-size: 13px;
 }

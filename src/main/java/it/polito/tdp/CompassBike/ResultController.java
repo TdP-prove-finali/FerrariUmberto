@@ -15,13 +15,11 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class ResultController {
@@ -48,7 +46,28 @@ public class ResultController {
     private JFXButton btnResult;
 
     @FXML
-    private Label lblNumRentals;
+    private Label lblResult;
+    
+    @FXML
+    private GridPane gridResult;
+    
+    @FXML
+    private Label lblDateSimulation;
+
+    @FXML
+    private Label lblVariation;
+
+    @FXML
+    private Label lblBikes;
+
+    @FXML
+    private Label lblDateData;
+
+    @FXML
+    private Label lblNewStation;
+
+    @FXML
+    private Label lblRedistribution;
 
     @FXML
     private JFXButton btnShowMap;
@@ -83,64 +102,39 @@ public class ResultController {
 
     @FXML
     void goToRentalsData(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RentalsDataImport.fxml"));
-        BorderPane root = loader.load();
-		
-        RentalsDataController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Dati noleggi");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToRentalsData(this.stage, this.model);
     }
 
     @FXML
     void goToSimulation(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SimulationScene.fxml"));
-        BorderPane root = loader.load();
-		
-        SimulationController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Simulazione");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToSimulation(this.stage, this.model);
     }
 
     @FXML
     void goToStationsData(ActionEvent event) throws Exception {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/StationsDataImport.fxml"));
-        BorderPane root = loader.load();
-		
-        StationsDataController controller = loader.getController();
-		
-		controller.setModel(this.model);
-		controller.setStage(this.stage);
-        
-		Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("Compass Bike - Dati stazioni");
-        stage.setScene(scene);
-        stage.show();
+    	ChangePage.goToStationsData(this.stage, this.model);
     }
 
     @FXML
     void initialize() {
-        assert btnStationsData != null : "fx:id=\"btnStationsData\" was not injected: check your FXML file 'ResultScene.fxml'.";
+    	assert btnStationsData != null : "fx:id=\"btnStationsData\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert btnRentalsData != null : "fx:id=\"btnRentalsData\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert btnSimulation != null : "fx:id=\"btnSimulation\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert btnResult != null : "fx:id=\"btnResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblResult != null : "fx:id=\"lblResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert gridResult != null : "fx:id=\"gridResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert btnShowMap != null : "fx:id=\"btnShowMap\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblDateSimulation != null : "fx:id=\"lblDateSimulation\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblVariation != null : "fx:id=\"lblVariation\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblBikes != null : "fx:id=\"lblBikes\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblDateData != null : "fx:id=\"lblDateData\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblNewStation != null : "fx:id=\"lblNewStation\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblRedistribution != null : "fx:id=\"lblRedistribution\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblCompleted != null : "fx:id=\"lblCompleted\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblEmpty != null : "fx:id=\"lblEmpty\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblCanceled != null : "fx:id=\"lblCanceled\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblFull != null : "fx:id=\"lblFull\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert tableStationsResult != null : "fx:id=\"tableStationsResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
 
         
     }
@@ -158,6 +152,32 @@ public class ResultController {
     	
     	
     	if(!this.noSimulationResult()) {
+    		this.lblResult.setText("Simulazione effettuata con successo!");
+    		
+    		this.lblDateSimulation.setText("Intervallo di tempo simulato: "+this.model.getStartDatePrint()+" - "+this.model.getEndDatePrint());
+    		this.lblDateData.setText("Intervallo di tempo dei dati: "+this.model.getStartDate()+" - "+this.model.getEndDate());
+    		
+    		this.lblVariation.setText(String.format("Variazione del traffico nel sistema: %.1f%%", this.model.getVariation()));
+    		this.lblNewStation.setText(String.format("Tendenza degli utenti a cercare altre stazioni: %.1f%%", this.model.getProbabilityNewStation()));
+    		
+    		this.lblBikes.setText("Numero di bici inserite nel sistema: "+this.model.getNumBikes());
+    		String txtRedistribution = "Algoritmo di redistribuzione notturna: ";
+    		switch(this.model.getRedistributionType()) {
+				case NESSUNO:
+					txtRedistribution += "NESSUNO";
+					break;
+				case UNIFORME:
+					txtRedistribution += "DISTRIBUZIONE UNIFORME";
+					break;
+				case VERSO_CENTRO:
+					txtRedistribution += "DALLA PERIFERIA VERSO IL CENTRO";
+					break;
+				case VERSO_PERIFERIA:
+					txtRedistribution += "DAL CENTRO VERSO LA PERIFERIA";
+					break;
+    		}
+    		this.lblRedistribution.setText(txtRedistribution);
+    		
     		this.lblCompleted.setText(this.lblCompleted.getText()+" "+this.model.getNumCompletedRent());
         	this.lblCanceled.setText(this.lblCanceled.getText()+" "+this.model.getNumCanceledRent());
         	this.lblEmpty.setText(this.lblEmpty.getText()+" "+this.model.getNumEmptyRent());
@@ -168,37 +188,35 @@ public class ResultController {
         	Map<Integer, Station> stations = this.model.getStationsResult();
         	List<Station> list = new ArrayList<>(stations.values());
         	list.sort(null);
-        	
-        	// TODO Da settare meglio le dimensioni delle colonne
-        	// TODO Centrare le celle
+
         	
         	TableColumn<Station, Integer> idColumn = new TableColumn<>("ID");
         	idColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("id"));
-        	idColumn.setPrefWidth(50);
+        	idColumn.setPrefWidth(30);
         	
         	TableColumn<Station, String> nameColumn = new TableColumn<>("Nome");
         	nameColumn.setCellValueFactory(new PropertyValueFactory<Station, String>("commonName"));
-        	nameColumn.setPrefWidth(180);
+        	nameColumn.setPrefWidth(160);
         	
         	TableColumn<Station, String> problemColumn = new TableColumn<>("Problema riscontrato");
         	problemColumn.setCellValueFactory(new PropertyValueFactory<Station, String>("problemString"));
         	problemColumn.setPrefWidth(150);
         	
-        	TableColumn<Station, Integer> completedColumn = new TableColumn<>("Numero noleggi completati");
+        	TableColumn<Station, Integer> completedColumn = new TableColumn<>("Noleggi completati");
         	completedColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("numCompletedRent"));
-        	completedColumn.setPrefWidth(100);
+        	completedColumn.setPrefWidth(130);
         	
-        	TableColumn<Station, Integer> canceledColumn = new TableColumn<>("Numero noleggi cancellati");
+        	TableColumn<Station, Integer> canceledColumn = new TableColumn<>("Noleggi cancellati");
         	canceledColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("numCanceledRent"));
-        	canceledColumn.setPrefWidth(100);
+        	canceledColumn.setPrefWidth(130);
         	
-        	TableColumn<Station, Integer> emptyColumn = new TableColumn<>("Tentativi di noleggio falliti");
+        	TableColumn<Station, Integer> emptyColumn = new TableColumn<>("Noleggi falliti");
         	emptyColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("numEmptyStationRent"));
         	emptyColumn.setPrefWidth(100);
         	
-        	TableColumn<Station, Integer> fullColumn = new TableColumn<>("Tentativi di riconsegna falliti");
+        	TableColumn<Station, Integer> fullColumn = new TableColumn<>("Riconsegne fallite");
         	fullColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("numFullStationRent"));
-        	fullColumn.setPrefWidth(100);
+        	fullColumn.setPrefWidth(120);
         	
         	
         	this.tableStationsResult.getColumns().add(idColumn);
@@ -223,7 +241,9 @@ public class ResultController {
     private boolean noSimulationResult() {
     	if(this.model.getCompletedRent() == null || this.model.getCanceledRent() == null) {
     		this.btnShowMap.setDisable(true);
-    		this.lblNumRentals.setText("Non sono disponibili risultati, si prega di effettuare una simulazione.");
+    		this.gridResult.setVisible(false);
+    		this.gridResult.setManaged(false);
+    		this.lblResult.setText("Non sono disponibili risultati, si prega di effettuare una simulazione.");
     		return true;
     	} else {
     		this.btnShowMap.setDisable(false);

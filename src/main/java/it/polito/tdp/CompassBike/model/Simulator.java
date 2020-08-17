@@ -23,11 +23,21 @@ import it.polito.tdp.CompassBike.model.Station.ProblemType;
 
 public class Simulator {
 	
+	// TODO Algoritmi di redistribuzione
+	
+	// TODO Gestire stazioni inserite manualmente dall'utente
+	
 	// Coda degli eventi
 	private Queue<Event> queue;
 	
 	// Parametri di simulazione
 	private EventsGenerator generator;
+	
+	public enum RedistributionType {
+		NESSUNO, UNIFORME, VERSO_CENTRO, VERSO_PERIFERIA
+	}
+	
+	private RedistributionType redistributionType;
 	
 	// Probabilità che l'utente si rechi alla stazione più vicina nel caso in cui quella in cui si trova sia piena
 	private Double probabilityNewStartStation = 0.60;
@@ -249,7 +259,7 @@ public class Simulator {
 			this.emptyStationRent.add(cloneEmpty);
 			
 			Random r = new Random();
-			if(this.probabilityNewStartStation < r.nextDouble()) {
+			if(this.probabilityNewStartStation > r.nextDouble()) {
 				// Nuova stazione per prelevare la bici
 				Station newStartStation = this.getNearestFullStation(startStation);
 				Duration durationToNewStartStation = this.graph.getEdge(startStation, newStartStation).getMinDuration();
@@ -433,6 +443,8 @@ public class Simulator {
 				st.setProblemType(ProblemType.PIENA);
 			else
 				st.setProblemType(ProblemType.NESSUNO);
+			
+			// TODO Da risolvere il problema nel caso siano uguali
 		}
 		
 	}
@@ -465,6 +477,11 @@ public class Simulator {
 	
 	public Integer getNumFullRent() {
 		return this.fullStationRent.size();
+	}
+
+
+	public void setRedistributionType(RedistributionType type) {
+		this.redistributionType = type;
 	}
 	
 

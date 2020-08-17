@@ -47,6 +47,9 @@ public class MapsGenerator {
 								"            margin-right: 5px;\r\n" + 
 								"            width: 12px;\r\n" + 
 								"        }" +
+								".mapboxgl-popup-close-button {\r\n" + 
+								"  display: none;\r\n" + 
+								"}\r\n" + 
 								"    </style>\r\n" + 
 								"</head>";
 	private final String BODY_START = "<body>\r\n" + 
@@ -78,8 +81,8 @@ public class MapsGenerator {
 								"    <h2>Legenda</h2>\r\n" + 
 								"    <div><span style=\"background-color: green\"></span>Stazioni che non presentano problemi rilevanti</div>\r\n" + 
 								"    <div><span style=\"background-color: red\"></span>Stazioni ad alto traffico</div>\r\n" + 
-								"    <div><span style=\"background-color: blue\"></span>Stazioni spesso piene</div>\r\n" + 
 								"    <div><span style=\"background-color: orange\"></span>Stazioni spesso vuote</div>\r\n" + 
+								"    <div><span style=\"background-color: blue\"></span>Stazioni spesso piene</div>\r\n" + 
 								"    <br \\>" +
 								"    <div><i>Selezionare una stazione per visualizzarne le informazioni</i></div>\r\n" +
 								"</div>\r\n";
