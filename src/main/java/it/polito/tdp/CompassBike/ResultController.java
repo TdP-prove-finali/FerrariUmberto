@@ -161,21 +161,11 @@ public class ResultController {
     		this.lblNewStation.setText(String.format("Tendenza degli utenti a cercare altre stazioni: %.1f%%", this.model.getProbabilityNewStation()));
     		
     		this.lblBikes.setText("Numero di bici inserite nel sistema: "+this.model.getNumBikes());
-    		String txtRedistribution = "Algoritmo di redistribuzione notturna: ";
-    		switch(this.model.getRedistributionType()) {
-				case NESSUNO:
-					txtRedistribution += "NESSUNO";
-					break;
-				case UNIFORME:
-					txtRedistribution += "DISTRIBUZIONE UNIFORME";
-					break;
-				case VERSO_CENTRO:
-					txtRedistribution += "DALLA PERIFERIA VERSO IL CENTRO";
-					break;
-				case VERSO_PERIFERIA:
-					txtRedistribution += "DAL CENTRO VERSO LA PERIFERIA";
-					break;
-    		}
+    		String txtRedistribution = "Redistribuzione notturna: ";
+    		if(this.model.getRedistribution())
+    			txtRedistribution += "ATTIVATA";
+    		else
+    			txtRedistribution += "DISATTIVATA";
     		this.lblRedistribution.setText(txtRedistribution);
     		
     		this.lblCompleted.setText(this.lblCompleted.getText()+" "+this.model.getNumCompletedRent());

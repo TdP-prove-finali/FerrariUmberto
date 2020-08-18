@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import it.polito.tdp.CompassBike.DAO.BikesDAO;
-import it.polito.tdp.CompassBike.model.Simulator.RedistributionType;
 
 @SuppressWarnings("unused")
 public class TestModel {
@@ -21,7 +20,7 @@ public class TestModel {
 		Long inizio = System.currentTimeMillis();
 		
 		model.setParametersSimulation(startDate, endDate, 0.0, startDate, endDate);
-		model.setRedistribution(RedistributionType.NESSUNO);
+		model.setRedistribution(false);
 		model.setProbabilityNewStartStation(60.0);
 		model.setNumBikes(14000);
 		model.runSimulation();

@@ -29,11 +29,7 @@ public class Simulator {
 	// Parametri di simulazione
 	private EventsGenerator generator;
 	
-	public enum RedistributionType {
-		NESSUNO, UNIFORME, VERSO_CENTRO, VERSO_PERIFERIA
-	}
-	
-	private RedistributionType redistributionType;
+	private boolean redistribution;
 	
 	// Probabilità che l'utente si rechi alla stazione più vicina nel caso in cui quella in cui si trova sia piena
 	private Double probabilityNewStartStation = 0.60;
@@ -82,7 +78,7 @@ public class Simulator {
 		this.queue = new PriorityQueue<>();
 		this.queue.addAll(this.generator.generateEvents());
 		
-		if(this.redistributionType != RedistributionType.NESSUNO) {
+		if(this.redistribution) {
 			// TODO Aggiungere eventi di ridistribuzione
 		}
 		
@@ -165,7 +161,7 @@ public class Simulator {
 			} while(distribuited < numBikes);
 		}
 
-		//System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
+		System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
 	}
 	
 	
@@ -289,20 +285,8 @@ public class Simulator {
 				startStation.addCanceledRent(bikeRent);
 			}
 			break;
-			
-		case RIDISTRIBUZIONE:
-			switch(this.redistributionType) {
-			case NESSUNO:
-				break;
-			case UNIFORME:
-				break;
-			case VERSO_CENTRO:
-				break;
-			case VERSO_PERIFERIA:
-				break;
-			}
-			break;
 		}
+			
 	}
 
 
@@ -498,8 +482,8 @@ public class Simulator {
 	}
 
 
-	public void setRedistributionType(RedistributionType type) {
-		this.redistributionType = type;
+	public void setRedistributionType(boolean redistribution) {
+		this.redistribution = redistribution;
 	}
 	
 }

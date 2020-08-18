@@ -9,7 +9,6 @@ import it.polito.tdp.CompassBike.DAO.BikesDAO;
 import it.polito.tdp.CompassBike.DAO.RentalsDAO;
 import it.polito.tdp.CompassBike.DAO.StationsDAO;
 import it.polito.tdp.CompassBike.dataImport.DataImport;
-import it.polito.tdp.CompassBike.model.Simulator.RedistributionType;
 
 public class Model {
 	
@@ -23,7 +22,7 @@ public class Model {
 	private Double probabilityNewStation;
 	
 	private Integer numBikes;
-	private RedistributionType redistributionType;
+	private boolean redistribution;
 
 	private LocalDate startDatePrint;
 	private LocalDate endDatePrint;
@@ -81,9 +80,9 @@ public class Model {
 	}
 	
 	
-	public void setRedistribution(RedistributionType type) {
-		this.redistributionType = type;
-		this.simulator.setRedistributionType(type);
+	public void setRedistribution(boolean redistribution) {
+		this.redistribution = redistribution;
+		this.simulator.setRedistributionType(redistribution);
 	}
 	
 	
@@ -220,8 +219,8 @@ public class Model {
 	}
 
 
-	public RedistributionType getRedistributionType() {
-		return redistributionType;
+	public boolean getRedistribution() {
+		return redistribution;
 	}
 	
 }

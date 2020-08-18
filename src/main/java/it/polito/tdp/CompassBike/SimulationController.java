@@ -5,7 +5,6 @@ import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXToggleButton;
 
 import it.polito.tdp.CompassBike.model.Model;
-import it.polito.tdp.CompassBike.model.Simulator.RedistributionType;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -112,21 +111,6 @@ public class SimulationController {
 	private JFXToggleButton toggleRedistribution;
 
 	@FXML
-    private JFXRadioButton radioUniform;
-
-    @FXML
-    private ToggleGroup radioRedistribution;
-
-    @FXML
-    private JFXRadioButton radioToCenter;
-
-    @FXML
-    private JFXRadioButton radioFromCenter;
-	
-	@FXML
-	private HBox hBoxRedistribution;
-
-	@FXML
 	private TextField txtNumBikes;
 
 	@FXML
@@ -152,11 +136,7 @@ public class SimulationController {
     	
     	this.clearGridDateData();
     	
-    	if(this.radioRedistribution.getSelectedToggle() != null)
-    		this.radioRedistribution.getSelectedToggle().setSelected(false);
-    	
     	this.toggleRedistribution.setSelected(false);
-    	this.hBoxRedistribution.setVisible(false);
     	
     	this.lblIncompleteData.setVisible(false);
 
@@ -182,20 +162,9 @@ public class SimulationController {
 	    model.setProbabilityNewStartStation(probability);
 	    
 	    if(this.toggleRedistribution.isSelected()) {
-	    	if(this.radioRedistribution.getSelectedToggle() != null) {
-	    		if(this.radioUniform.isSelected())
-	    			this.model.setRedistribution(RedistributionType.UNIFORME);
-	    		else if(this.radioFromCenter.isSelected())
-	    			this.model.setRedistribution(RedistributionType.VERSO_PERIFERIA);
-	    		else if(this.radioToCenter.isSelected())
-	    			this.model.setRedistribution(RedistributionType.VERSO_CENTRO);
-	    	} else {
-	    		this.lblIncompleteData.setVisible(true);
-	    		this.btnPlaySimulation.setDisable(true);
-	    		return;
-	    	}
+	    	this.model.setRedistribution(true);
 	    } else {
-	    	this.model.setRedistribution(RedistributionType.NESSUNO);
+	    	this.model.setRedistribution(false);
 	    }
 	    
 	    this.model.setNumBikes(this.numBikes);
@@ -373,18 +342,6 @@ public class SimulationController {
     	
     	return true;
     }
-    
-    @FXML
-    void showHBoxRedistribution(ActionEvent event) {
-    	if(this.toggleRedistribution.isSelected()) {
-            this.radioUniform.setSelected(true);
-    		this.hBoxRedistribution.setVisible(true);
-    	} else {
-    		if(this.radioRedistribution.getSelectedToggle() != null)
-        		this.radioRedistribution.getSelectedToggle().setSelected(false);
-    		this.hBoxRedistribution.setVisible(false);
-    	}
-    }
 
     @FXML
     void goToRentalsData(ActionEvent event) throws Exception {
@@ -423,11 +380,6 @@ public class SimulationController {
         assert txtProbabilityNewStation != null : "fx:id=\"txtProbabilityNewStation\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblErrorParameters != null : "fx:id=\"lblErrorParameters\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert toggleRedistribution != null : "fx:id=\"toggleRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
-        assert hBoxRedistribution != null : "fx:id=\"hBoxRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
-        assert radioUniform != null : "fx:id=\"radioUniform\" was not injected: check your FXML file 'SimulationScene.fxml'.";
-        assert radioRedistribution != null : "fx:id=\"radioRedistribution\" was not injected: check your FXML file 'SimulationScene.fxml'.";
-        assert radioToCenter != null : "fx:id=\"radioToCenter\" was not injected: check your FXML file 'SimulationScene.fxml'.";
-        assert radioFromCenter != null : "fx:id=\"radioFromCenter\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert txtNumBikes != null : "fx:id=\"txtNumBikes\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblErrorBike != null : "fx:id=\"lblErrorBike\" was not injected: check your FXML file 'SimulationScene.fxml'.";
         assert lblMaxBikes != null : "fx:id=\"lblMaxBikes\" was not injected: check your FXML file 'SimulationScene.fxml'.";
@@ -436,7 +388,6 @@ public class SimulationController {
         assert lblIncompleteData != null : "fx:id=\"lblIncompleteData\" was not injected: check your FXML file 'SimulationScene.fxml'.";
 
         this.hBoxManual.setVisible(false);
-        this.hBoxRedistribution.setVisible(false);
         
         this.gridDateData.setDisable(true);
         
