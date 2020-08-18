@@ -46,6 +46,8 @@ public class Simulator {
 	private LocalDate endDate;
 	private Double variation;
 	
+	private Integer numBikes;
+	
 	// Modello del mondo
 	private Graph<Station, RouteEdge> graph;
 	
@@ -99,17 +101,25 @@ public class Simulator {
 
 
 	/**
-	 * Effettua la distribuzione iniziale delle bici nel sistema.
+	 * Effettua la distribuzione iniziale delle bici nel sistema, eventualmente aggiungendo nuove bici inserite dall'utente.
 	 * Le bici vengono distribuite in maniera uniforme tra le varie stazioni dando precedenza alle stazioni con il maggior numero di docks.
 	 */
 	private void initBike() {
 		List<Bike> listBikes = new ArrayList<>(this.bikes.values());
-		Integer numBikes = listBikes.size();
+		listBikes.sort(null);
+		Integer lastId = listBikes.get(listBikes.size()-1).getId();
 		
-		Integer numDocks = 0;
-		for(Integer id : this.stations.keySet()) {
-			numDocks += this.stations.get(id).getNumDocks();
+		Integer numBikesDB = listBikes.size();
+		
+		Integer numDocks = BikesDAO.getNumDocks();
+		
+		
+		if(numBikes > numBikesDB) {
+			for(int k = numBikesDB; k < numBikes; k++) {
+				listBikes.add(new Bike(++lastId, null, false, BikeStatus.DA_DISTRIBUIRE));
+			}
 		}
+		
 		
 		Integer distribuited = 0;
 		
@@ -154,6 +164,8 @@ public class Simulator {
 				}
 			} while(distribuited < numBikes);
 		}
+		
+		System.out.println("\n\nBICI IN 9002 "+this.stations.get(9002).getNumBikes()+"\n");
 
 		//System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
 	}
@@ -444,9 +456,14 @@ public class Simulator {
 			else
 				st.setProblemType(ProblemType.NESSUNO);
 			
-			// TODO Da risolvere il problema nel caso siano uguali
+			// TODO Considerazione anche sui noleggi completati per TRFFICO
 		}
 		
+	}
+	
+	
+	public void setNumBikes(Integer numBikes) {
+		this.numBikes = numBikes;
 	}
 	
 	

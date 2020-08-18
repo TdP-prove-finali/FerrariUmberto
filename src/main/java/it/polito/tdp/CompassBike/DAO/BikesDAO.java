@@ -83,7 +83,8 @@ public class BikesDAO {
 	 */
 	public static Integer getNumDocks() {
 		String sql = "SELECT SUM(num_docks) AS num " +
-				"FROM stations";
+				"FROM stations " +
+				"WHERE installed = 1 ";
 		Integer result = null;
 		
 		Connection conn = DBConnect.getConnection();

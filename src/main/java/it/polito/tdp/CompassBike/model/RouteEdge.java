@@ -7,7 +7,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 /*
  * Arco personalizzato
  */
-public class RouteEdge extends DefaultWeightedEdge {
+public class RouteEdge extends DefaultWeightedEdge implements Comparable<RouteEdge> {
 	
 	private static final long serialVersionUID = 1L;
 	private Duration minDuration;
@@ -36,6 +36,11 @@ public class RouteEdge extends DefaultWeightedEdge {
 
 	public void setMaxDuration(Duration maxDuration) {
 		this.maxDuration = maxDuration;
+	}
+
+	@Override
+	public int compareTo(RouteEdge o) {
+		return this.minDuration.compareTo(o.minDuration);
 	}
 
 	

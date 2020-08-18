@@ -192,7 +192,7 @@ public class ResultController {
         	
         	TableColumn<Station, Integer> idColumn = new TableColumn<>("ID");
         	idColumn.setCellValueFactory(new PropertyValueFactory<Station, Integer>("id"));
-        	idColumn.setPrefWidth(30);
+        	idColumn.setPrefWidth(40);
         	
         	TableColumn<Station, String> nameColumn = new TableColumn<>("Nome");
         	nameColumn.setCellValueFactory(new PropertyValueFactory<Station, String>("commonName"));

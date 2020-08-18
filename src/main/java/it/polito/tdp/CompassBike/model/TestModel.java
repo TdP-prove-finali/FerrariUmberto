@@ -3,19 +3,21 @@ package it.polito.tdp.CompassBike.model;
 import java.time.LocalDate;
 import java.util.Map;
 
+import it.polito.tdp.CompassBike.DAO.BikesDAO;
+
 @SuppressWarnings("unused")
 public class TestModel {
 
 	public static void main(String[] args) {
 		Model model = new Model();
 		
-		/*
 		LocalDate startDate = LocalDate.of(2020, 05, 20);
-		LocalDate endDate = LocalDate.of(2020, 05, 26);
+		LocalDate endDate = LocalDate.of(2020, 05, 21);
 		
 		Long inizio = System.currentTimeMillis();
 		
-		model.setParametersSimulation(startDate, endDate, 10.0);
+		model.setParametersSimulation(startDate, endDate, 10.0, startDate, endDate);
+		model.setNumBikes(14000);
 		model.runSimulation();
 		
 		Map<Integer, Station> res = model.getStationsResult();
@@ -32,11 +34,9 @@ public class TestModel {
 		Long fine = System.currentTimeMillis();
 		Long durata = fine - inizio;
 		System.out.println(durata / 1000.0);
-		*/
 		
-		model.getMapsStations();
-		System.out.println("QUI");
-		System.out.println("FATTO");
+		
+		//USER ST [133, 805, 72, 9002]
 	}
 
 }

@@ -1,6 +1,6 @@
 package it.polito.tdp.CompassBike.model;
 
-public class Bike {
+public class Bike implements Comparable<Bike> {
 	
 	public enum BikeStatus {
 		STAZIONE, NOLEGGIATA, DA_DISTRIBUIRE
@@ -85,6 +85,11 @@ public class Bike {
 
 	public String toString() {
 		return this.id+" "+this.station.getId();
+	}
+
+	@Override
+	public int compareTo(Bike o) {
+		return this.id.compareTo(o.id);
 	}
 
 }

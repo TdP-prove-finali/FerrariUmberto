@@ -74,8 +74,10 @@ public class Model {
 	
 	
 	public void setNumBikes(Integer numBikes) {
+		if(numBikes > this.numDocks)
+			numBikes = this.numDocks;
 		this.numBikes = numBikes;
-		// TODO Settare bici nel simulatore
+		this.simulator.setNumBikes(numBikes);
 	}
 	
 	

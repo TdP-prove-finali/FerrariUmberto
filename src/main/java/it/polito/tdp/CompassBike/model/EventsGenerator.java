@@ -17,6 +17,8 @@ import it.polito.tdp.CompassBike.model.Event.EventType;
 
 public class EventsGenerator {
 	
+	// TODO Togliere commenti setPercentageuserStation
+	
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Station, Double> percentageStartStations;
@@ -35,6 +37,8 @@ public class EventsGenerator {
 	private Double variation = 0.0;
 	
 	private Map<Integer, Station> stationsIdMap;
+	
+	private final Integer NUM_NEAR_STATIONS = 5;
 	
 	
 	/**
@@ -127,6 +131,7 @@ public class EventsGenerator {
 		this.stationsIdMap = stationsIdMap;
 		
 		this.percentageStartStations = RentalsDAO.percentageStartStationsPeriod(this.startDate, this.endDate, this.stationsIdMap);
+		
 		this.percentageDayPeriod = RentalsDAO.percentageDayPeriod(this.startDate, this.endDate);
 		this.percentageTime = new HashMap<>();
 		for(LocalDate day = this.startDate; day.isBefore(this.endDate.plusDays(1)); day = day.plusDays(1)) {
@@ -134,9 +139,11 @@ public class EventsGenerator {
 		}
 		
 		this.numRentals = RentalsDAO.getNumRentalsPeriod(this.startDate, this.endDate);
-		//System.out.println("Num rentals DB "+this.numRentals);
 		
 		this.buildGraph();
+		
+		this.setPercentageUserStation();
+		
 		Long fine = System.currentTimeMillis();
 		Long durata = fine - inizio;
 		System.out.println("TEMPO LOAD "+durata / 1000.0+"\n");
@@ -167,6 +174,103 @@ public class EventsGenerator {
 	}
 	
 	
+	/**
+	 * Setta le percentuali relative alle stazioni inserite manualmente dall'utente, sulla base dei dati delle 5 stazioni più vicine.
+	 */
+	private void setPercentageUserStation() {
+		for(Integer id : this.stationsIdMap.keySet()) {
+			if(this.percentageStartStations.get(this.stationsIdMap.get(id)) == null) {
+				Station userSt = this.stationsIdMap.get(id);
+				
+				List<DistanceStations> listDistance = new ArrayList<>();
+				for(Station st : this.stationsIdMap.values()) {
+					if(this.percentageStartStations.get(st) != null)
+						listDistance.add(new DistanceStations(userSt, st, this.distFrom(userSt.getLatitude(), userSt.getLongitude(), st.getLatitude(), st.getLongitude())));
+				}
+				
+				listDistance.sort(null);
+				Double percentageUserStation = 0.0;
+				for(int i = 0; i < this.NUM_NEAR_STATIONS; i++) {
+					Station st = listDistance.get(i).getEndStation();
+					Double percentageSt = this.percentageStartStations.get(st);
+					if(percentageSt == null) {
+						System.out.println("NULL");
+					}
+					//System.out.println("PROB ST PRIMA "+percentageSt);
+					percentageUserStation += percentageSt * 0.2;
+					percentageSt *= 0.8;
+					//System.out.println("PROB ST DOPO "+percentageSt);
+					this.percentageStartStations.remove(st);
+					this.percentageStartStations.put(st, percentageSt);
+					
+					
+					for(RouteEdge edge : this.graph.outgoingEdgesOf(st)) {
+						Station endStation = this.graph.getEdgeTarget(edge);
+						if(!this.graph.containsEdge(userSt, endStation)) {
+							RouteEdge newEdge = new RouteEdge(edge.getMinDuration().plusSeconds(listDistance.get(i).getDistance().intValue()), edge.getMaxDuration().plusSeconds(listDistance.get(i).getDistance().intValue()));
+							this.graph.addEdge(userSt, endStation, newEdge);
+							this.graph.setEdgeWeight(newEdge, this.graph.getEdgeWeight(edge));
+						}
+					}
+					
+					
+					for(Station startSt : this.stationsIdMap.values()) {
+						Double percentageEndUserSt = 0.0;
+						Integer count = 0;
+						Integer first = null;
+						Double percTotal = 0.0;
+						for(RouteEdge edge : this.graph.outgoingEdgesOf(startSt)) {
+							for(int j = 0; j < this.NUM_NEAR_STATIONS; j++) {
+								if(this.graph.getEdgeTarget(edge).equals(listDistance.get(j).getEndStation())) {
+									if(first == null)
+										first = j;
+									count++;
+								}
+							}
+						}
+						
+						if(first != null && count >= this.NUM_NEAR_STATIONS - 2) {
+							for(RouteEdge edge : this.graph.outgoingEdgesOf(startSt)) {
+								for(int j = 0; j < this.NUM_NEAR_STATIONS; j++) {
+									if(this.graph.getEdgeTarget(edge).equals(listDistance.get(j).getEndStation())) {
+										Double edgeWeight = this.graph.getEdgeWeight(edge);
+										percTotal += edgeWeight;
+										percentageEndUserSt += edgeWeight * 0.2;
+										edgeWeight *= 0.8;
+										this.graph.setEdgeWeight(edge, edgeWeight);
+									}
+								}
+							}
+							/*
+							System.out.println("\nPERC FIRST "+this.graph.getEdge(startSt, listDistance.get(first).getEndStation()));
+							System.out.println("PERC TOTAL "+percTotal+" DIVISO "+percTotal/count);
+							System.out.println("PERC USER "+percentageEndUserSt+"\n");
+							*/
+							
+							RouteEdge edge = this.graph.getEdge(startSt, listDistance.get(first).getEndStation());
+							RouteEdge newEdge = new RouteEdge(edge.getMinDuration().plusSeconds(listDistance.get(i).getDistance().intValue()), edge.getMaxDuration().plusSeconds(listDistance.get(i).getDistance().intValue()));
+							this.graph.addEdge(startSt, userSt, newEdge);
+							this.graph.setEdgeWeight(newEdge, percentageEndUserSt);
+						}
+						
+					}
+				}
+				this.percentageStartStations.remove(userSt);
+				this.percentageStartStations.put(userSt, percentageUserStation);
+				
+				/*
+				System.out.println("PRIMA LISTA "+this.graph.outgoingEdgesOf(listDistance.get(0).getEndStation()).size());
+				System.out.println("ARCHI USER ST "+this.graph.outgoingEdgesOf(userSt).size());
+				
+				System.out.println("PROB PRIMA LIST "+this.percentageStartStations.get(listDistance.get(0).getEndStation()));
+				System.out.println("PROB USER ST "+percentageUserStation);
+				*/
+				
+			}
+		}
+		
+	}
+	
 	
 	public Graph<Station, RouteEdge> getGraph() {
 		return this.graph;
@@ -188,6 +292,23 @@ public class EventsGenerator {
 	 */
 	public void setUncertainty(Double uncertainty) {
 		this.uncertainty = uncertainty;
+	}
+	
+	
+	/**
+	 * Permette di calcolare la distanza (in metri) tra due punti, espressi in latitudine e longitudine.
+	 */
+	public Double distFrom(Double lat1, Double long1, Double lat2, Double long2) {
+	    Double earthRadius = (double) 6371000;
+	    Double dLat = Math.toRadians(lat2-lat1);
+	    Double dLong = Math.toRadians(long2-long1);
+	    Double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+	               Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+	               Math.sin(dLong/2) * Math.sin(dLong/2);
+	    Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	    Double dist = (Double) (earthRadius * c);
+
+	    return dist;
 	}
 
 }
