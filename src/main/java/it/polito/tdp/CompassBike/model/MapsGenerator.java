@@ -80,7 +80,7 @@ public class MapsGenerator {
 	private final String LEGEND_RESULT = "<div id=\"legend\" class=\"legend\">\r\n" + 
 								"    <h2>Legenda</h2>\r\n" + 
 								"    <div><span style=\"background-color: green\"></span>Stazioni che non presentano problemi rilevanti</div>\r\n" + 
-								"    <div><span style=\"background-color: red\"></span>Stazioni ad alto traffico</div>\r\n" + 
+								"    <div><span style=\"background-color: red\"></span>Stazioni ad alto traffico con problemi rilevanti</div>\r\n" + 
 								"    <div><span style=\"background-color: orange\"></span>Stazioni spesso vuote</div>\r\n" + 
 								"    <div><span style=\"background-color: blue\"></span>Stazioni spesso piene</div>\r\n" + 
 								"    <br \\>" +

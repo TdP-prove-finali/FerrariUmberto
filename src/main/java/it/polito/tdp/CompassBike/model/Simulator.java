@@ -23,10 +23,6 @@ import it.polito.tdp.CompassBike.model.Station.ProblemType;
 
 public class Simulator {
 	
-	// TODO Algoritmi di redistribuzione
-	
-	// TODO Gestire stazioni inserite manualmente dall'utente
-	
 	// Coda degli eventi
 	private Queue<Event> queue;
 	
@@ -85,6 +81,10 @@ public class Simulator {
 		
 		this.queue = new PriorityQueue<>();
 		this.queue.addAll(this.generator.generateEvents());
+		
+		if(this.redistributionType != RedistributionType.NESSUNO) {
+			// TODO Aggiungere eventi di ridistribuzione
+		}
 		
 		this.graph = this.generator.getGraph();
 		//System.out.println("Vertici: "+this.graph.vertexSet().size()+"\nArchi: "+this.graph.edgeSet().size());
@@ -164,8 +164,6 @@ public class Simulator {
 				}
 			} while(distribuited < numBikes);
 		}
-		
-		System.out.println("\n\nBICI IN 9002 "+this.stations.get(9002).getNumBikes()+"\n");
 
 		//System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
 	}
@@ -291,6 +289,19 @@ public class Simulator {
 				startStation.addCanceledRent(bikeRent);
 			}
 			break;
+			
+		case RIDISTRIBUZIONE:
+			switch(this.redistributionType) {
+			case NESSUNO:
+				break;
+			case UNIFORME:
+				break;
+			case VERSO_CENTRO:
+				break;
+			case VERSO_PERIFERIA:
+				break;
+			}
+			break;
 		}
 	}
 
@@ -369,20 +380,14 @@ public class Simulator {
 	 */
 	private Station getNearestEmptyStation(Station station) {
 		Station result = null;
-		Duration minDuration = null;
 		
-		for(Station near : Graphs.successorListOf(this.graph, station)) {
+		List<RouteEdge> listEdge = new ArrayList<>(this.graph.outgoingEdgesOf(station));
+		listEdge.sort(null);
+		for(RouteEdge edge : listEdge) {
+			Station near = this.graph.getEdgeTarget(edge);
 			if(near.getNumEmptyDocks() > 0) {
-				RouteEdge edge = this.graph.getEdge(station, near);
-				
-				if(minDuration == null) {
-					minDuration = edge.getMinDuration();
-					result = near;
-				}
-				else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
-					minDuration = edge.getMinDuration();
-					result = near;
-				}
+				result = near;
+				break;
 			}
 		}
 		
@@ -397,21 +402,14 @@ public class Simulator {
 	 */
 	private Station getNearestFullStation(Station station) {
 		Station result = null;
-		Duration minDuration = null;
-		
-		Integer conta = 0;
-		for(Station near : Graphs.successorListOf(this.graph, station)) {
+
+		List<RouteEdge> listEdge = new ArrayList<>(this.graph.outgoingEdgesOf(station));
+		listEdge.sort(null);
+		for(RouteEdge edge : listEdge) {
+			Station near = this.graph.getEdgeTarget(edge);
 			if(near.getNumBikes() > 0) {
-				conta++;
-				RouteEdge edge = this.graph.getEdge(station, near);
-				if(minDuration == null) {
-					minDuration = edge.getMinDuration();
-					result = near;
-				}
-				else if(edge.getMinDuration().toMinutes() < minDuration.toMinutes()) {
-					minDuration = edge.getMinDuration();
-					result = near;
-				}
+				result = near;
+				break;
 			}
 		}
 		
@@ -427,41 +425,44 @@ public class Simulator {
 		Double avgEmpty = ((double) this.emptyStationRent.size()) / ((double) this.stations.size());
 		Double avgFull = ((double) this.fullStationRent.size()) / ((double) this.stations.size());
 		
+		Double avgTotal = (((double) this.completedRent.size()) + ((double) this.canceledRent.size()) + ((double) this.emptyStationRent.size()) + ((double) this.fullStationRent.size())) / ((double) this.stations.size());
+		
 		Double percCanceled = 0.0;
 		Double percEmpty = 0.0;
 		Double percFull = 0.0;
+		Double percTotal = 0.0;
 		
-		for(Integer id : this.stations.keySet()) {
-			Station st = this.stations.get(id);
+		for(Station st : this.stations.values()) {
+			percCanceled = st.getNumCanceledRent() / avgCanceled;
+			percEmpty = st.getNumEmptyStationRent() / avgEmpty;
+			percFull = st.getNumFullStationRent() / avgFull;
+			percTotal = (st.getNumCompletedRent() + st.getNumCanceledRent() + st.getNumEmptyStationRent() + st.getNumFullStationRent()) / avgTotal;
 			
-			percCanceled = 0.0;
-			percEmpty = 0.0;
-			percFull = 0.0;
 			
-			if(st.getNumCanceledRent() > avgCanceled) 
-				percCanceled = (st.getNumCanceledRent() - avgCanceled) / avgCanceled * 100.0;
-			
-			if(st.getNumEmptyStationRent() > avgEmpty)
-				percEmpty = (st.getNumEmptyStationRent() - avgEmpty) / avgEmpty * 100.0;
-			
-			if(st.getNumFullStationRent() > avgFull)
-				percFull = (st.getNumFullStationRent() - avgFull) / avgFull * 100.0;
-			
-			if(percCanceled > percEmpty && percCanceled > percFull)
-				st.setProblemType(ProblemType.TRAFFICO);
-			else if(percEmpty > percCanceled && percEmpty > percFull)
+			if(percEmpty > 3)
 				st.setProblemType(ProblemType.VUOTA);
-			else if(percFull > percCanceled && percFull > percCanceled)
+			else if(percFull > 3)
 				st.setProblemType(ProblemType.PIENA);
-			else
-				st.setProblemType(ProblemType.NESSUNO);
+			else {
+				if(percTotal > 1 && ((percEmpty > 1 && percFull > 1) || (percEmpty > 1 && percCanceled > 1) || (percFull > 1 && percCanceled > 1))) 
+					st.setProblemType(ProblemType.TRAFFICO);
+				else if(percEmpty > percFull && percEmpty > 1)
+					st.setProblemType(ProblemType.VUOTA);
+				else if(percFull > percEmpty && percFull > 1)
+					st.setProblemType(ProblemType.PIENA);
+				else 
+					st.setProblemType(ProblemType.NESSUNO);
+			}
 			
-			// TODO Considerazione anche sui noleggi completati per TRFFICO
 		}
-		
+
 	}
 	
 	
+	/**
+	 * Permette di settare un numero di {@link Bike bici} scelto dall'utente.
+	 * @param numBikes Numero di bici scelto.
+	 */
 	public void setNumBikes(Integer numBikes) {
 		this.numBikes = numBikes;
 	}
@@ -501,5 +502,4 @@ public class Simulator {
 		this.redistributionType = type;
 	}
 	
-
 }

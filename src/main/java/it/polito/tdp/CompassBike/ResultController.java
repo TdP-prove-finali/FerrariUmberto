@@ -196,7 +196,7 @@ public class ResultController {
         	
         	TableColumn<Station, String> nameColumn = new TableColumn<>("Nome");
         	nameColumn.setCellValueFactory(new PropertyValueFactory<Station, String>("commonName"));
-        	nameColumn.setPrefWidth(160);
+        	nameColumn.setPrefWidth(150);
         	
         	TableColumn<Station, String> problemColumn = new TableColumn<>("Problema riscontrato");
         	problemColumn.setCellValueFactory(new PropertyValueFactory<Station, String>("problemString"));

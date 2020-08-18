@@ -17,8 +17,6 @@ import it.polito.tdp.CompassBike.model.Event.EventType;
 
 public class EventsGenerator {
 	
-	// TODO Togliere commenti setPercentageuserStation
-	
 	private Graph<Station, RouteEdge> graph;
 	
 	private Map<Station, Double> percentageStartStations;
@@ -185,7 +183,7 @@ public class EventsGenerator {
 				List<DistanceStations> listDistance = new ArrayList<>();
 				for(Station st : this.stationsIdMap.values()) {
 					if(this.percentageStartStations.get(st) != null)
-						listDistance.add(new DistanceStations(userSt, st, this.distFrom(userSt.getLatitude(), userSt.getLongitude(), st.getLatitude(), st.getLongitude())));
+						listDistance.add(new DistanceStations(userSt, st, this.distanceBetween(userSt.getLatitude(), userSt.getLongitude(), st.getLatitude(), st.getLongitude())));
 				}
 				
 				listDistance.sort(null);
@@ -193,13 +191,10 @@ public class EventsGenerator {
 				for(int i = 0; i < this.NUM_NEAR_STATIONS; i++) {
 					Station st = listDistance.get(i).getEndStation();
 					Double percentageSt = this.percentageStartStations.get(st);
-					if(percentageSt == null) {
-						System.out.println("NULL");
-					}
-					//System.out.println("PROB ST PRIMA "+percentageSt);
+					
 					percentageUserStation += percentageSt * 0.2;
 					percentageSt *= 0.8;
-					//System.out.println("PROB ST DOPO "+percentageSt);
+					
 					this.percentageStartStations.remove(st);
 					this.percentageStartStations.put(st, percentageSt);
 					
@@ -241,11 +236,6 @@ public class EventsGenerator {
 									}
 								}
 							}
-							/*
-							System.out.println("\nPERC FIRST "+this.graph.getEdge(startSt, listDistance.get(first).getEndStation()));
-							System.out.println("PERC TOTAL "+percTotal+" DIVISO "+percTotal/count);
-							System.out.println("PERC USER "+percentageEndUserSt+"\n");
-							*/
 							
 							RouteEdge edge = this.graph.getEdge(startSt, listDistance.get(first).getEndStation());
 							RouteEdge newEdge = new RouteEdge(edge.getMinDuration().plusSeconds(listDistance.get(i).getDistance().intValue()), edge.getMaxDuration().plusSeconds(listDistance.get(i).getDistance().intValue()));
@@ -257,14 +247,6 @@ public class EventsGenerator {
 				}
 				this.percentageStartStations.remove(userSt);
 				this.percentageStartStations.put(userSt, percentageUserStation);
-				
-				/*
-				System.out.println("PRIMA LISTA "+this.graph.outgoingEdgesOf(listDistance.get(0).getEndStation()).size());
-				System.out.println("ARCHI USER ST "+this.graph.outgoingEdgesOf(userSt).size());
-				
-				System.out.println("PROB PRIMA LIST "+this.percentageStartStations.get(listDistance.get(0).getEndStation()));
-				System.out.println("PROB USER ST "+percentageUserStation);
-				*/
 				
 			}
 		}
@@ -298,7 +280,7 @@ public class EventsGenerator {
 	/**
 	 * Permette di calcolare la distanza (in metri) tra due punti, espressi in latitudine e longitudine.
 	 */
-	public Double distFrom(Double lat1, Double long1, Double lat2, Double long2) {
+	private Double distanceBetween(Double lat1, Double long1, Double lat2, Double long2) {
 	    Double earthRadius = (double) 6371000;
 	    Double dLat = Math.toRadians(lat2-lat1);
 	    Double dLong = Math.toRadians(long2-long1);

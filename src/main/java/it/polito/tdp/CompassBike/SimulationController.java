@@ -339,7 +339,7 @@ public class SimulationController {
     		return false;
     	}
     	
-    	if(probability < 5.0 || probability > 100.0) {
+    	if(probability < 0.0 || probability > 100.0) {
     		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 5.0% e 100.0%.");
     		return false;
     	}
