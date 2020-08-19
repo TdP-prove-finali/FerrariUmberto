@@ -17,6 +17,10 @@ public class ParseCSVRentals {
 	private Integer correctLine = 0;
 	private Integer errorLine = 0;
 
+	/**
+	 * Metodo di utilità per leggere un file CSV che contiene le informazioni sui noleggi
+	 * @return La lista di {@link RentalData noleggi}
+	 */
 	public List<RentalData> parse(File file) {
         String line = "";
         List<RentalData> rentals = new ArrayList<>();

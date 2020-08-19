@@ -14,9 +14,9 @@ import it.polito.tdp.CompassBike.model.Station;
 public class DataImport {
 	
 	/**
-	 * Permette di leggere il file (in formato JSON) che si trova alla directory passata come parametro e aggiungere le stazioni lette correttamente al db.
-	 * @param directory La directory del file
-	 * @return
+	 * Permette di leggere il file (in formato JSON) e aggiungere le stazioni lette correttamente al db.
+	 * @param Il file da leggere
+	 * @return Un vettore di interi, nella prima posizione si trova il codice di errore, nella seconda il numero di righe lette correttamente e nella terza il numero di quelle che contengono errori di formato.
 	 */
 	public static Integer[] parseJSONStations(File file) {
 		Integer[] result = new Integer[3];
@@ -47,8 +47,9 @@ public class DataImport {
 	
 	
 	/**
-	 * Permette di leggere il file (in formato CSV) che si trova alla directory passata come parametro e aggiungere i noleggi lette correttamente al db.
-	 * @param directory La directory del file
+	 * Permette di leggere il file (in formato CSV) e aggiungere i noleggi letti correttamente al db.
+	 * @param Il file da leggere
+	 * @return Un vettore di interi, nella prima posizione si trova il codice di errore, nella seconda il numero di righe lette correttamente e nella terza il numero di quelle che contengono errori di formato.
 	 */
 	public static Integer[] parseCSVRentals(File file) {
 		Integer[] result = new Integer[3];

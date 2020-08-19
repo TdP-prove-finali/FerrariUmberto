@@ -23,7 +23,7 @@ public class ParseJSONStations {
 	
 	/**
 	 * Metodo di utilità per leggere un file JSON che contiene le informazioni sulle stazioni
-	 * @return ritorna la lista delle stazioni
+	 * @return La lista di {@link StationData stazioni}
 	 */
 	public List<StationData> parse(File file) {
 		Path path = Paths.get(file.getAbsolutePath());
@@ -93,8 +93,6 @@ public class ParseJSONStations {
 							break;
 					}
 				}
-				if(station.getNumDocks() - (station.getNumBikes() + station.getNumEmptyDocks()) != 0)
-					station.setBroken(true);
 				
 				stations.add(station);
 			} catch(JSONException e) {errorLine++;}

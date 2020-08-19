@@ -6,21 +6,13 @@ import java.sql.SQLException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-/**
- * Utility class for connecting to the database
- * Uses the HikaryCP Library
- * 
- * @author Umberto
- *
- */
 public class DBConnect {
 	
 	private static final String jdbcURL = "jdbc:mysql://localhost/bike_sharing";
 	private static HikariDataSource ds;
 	
 	/**
-	 * Metodo di utilità per la connessione al DB
-	 * @return oggetto {Connection} 
+	 * Metodo per la connessione al db.
 	 */
 	public static Connection getConnection() {
 		

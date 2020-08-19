@@ -293,6 +293,10 @@ public class RentalsDAO {
 	}
 	
 	
+	/**
+	 * Permette di ottenere tutti i noleggi raggruppati per data consecutiva.
+	 * @return La lista che contiene i {@link GroupRentals noleggi raggruppati} 
+	 */
 	public static List<GroupRentals> getGroupRentals() {
 		String sql = "SELECT MIN(tab.dat) AS fromDate, MAX(tab.dat) AS toDate, COUNT(*) AS num " + 
 				"FROM (select DATE(start_date) AS dat, DATE(start_date) - (dense_rank() over(order by DATE(start_date))) AS g " + 

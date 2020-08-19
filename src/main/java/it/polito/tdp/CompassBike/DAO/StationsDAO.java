@@ -17,11 +17,10 @@ public class StationsDAO {
 	/**
 	 * Permette di aggiungere nuove stazioni al db.
 	 * Nel caso sia già presente una stazione con lo stesso ID verranno aggiornati i parametri ad essa associati.
-	 *  
 	 * @param stations La {@link List lista} di {@link StationData stazioni} da aggiungere.
 	 */
 	public static void addStation(List<StationData> stations) {
-		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
+		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
@@ -52,7 +51,6 @@ public class StationsDAO {
 				st.setInt(11, station.getNumDocks());
 				st.setDouble(12, station.getLatitude());
 				st.setDouble(13, station.getLongitude());
-				st.setBoolean(14, station.isBroken());
 				
 				
 				st.addBatch();
@@ -75,7 +73,6 @@ public class StationsDAO {
 	/**
 	 * Permette di aggiungere una nuova stazione al db, inserita manualmente dall'utente.
 	 * Nel caso sia già presente una stazione con lo stesso ID verranno aggiornati i parametri ad essa associati.
-	 *  
 	 * @param station La {@link Station stazione} da aggiungere.
 	 */
 	public static void addStationUser(Station station) {
@@ -113,7 +110,6 @@ public class StationsDAO {
 	
 	/**
 	 * Permette di eliminare una stazione inserita manualmente dall'utente dal db.
-	 *  
 	 * @param station La {@link Station stazione} da eliminare.
 	 */
 	public static void deleteStationUser(Station station) {
@@ -136,7 +132,6 @@ public class StationsDAO {
 	
 	/**
 	 * Permette di aggiornare i parametri di una stazione
-	 *  
 	 * @param station La {@link Station stazione} a cui modificare i parametri.
 	 */
 	public static void updateStation(Station station) {
@@ -314,6 +309,12 @@ public class StationsDAO {
 	}
 
 
+	/**
+	 * Permette di sapere se il punto passato come parametro si trovi all'interno dell'area del servizio.
+	 * @param lat Latitudine del punto
+	 * @param lon Longitudine del punto
+	 * @return boolean {@code true} se si trova all'interno dell'area, {@code false} altrimenti
+	 */
 	public static boolean isInsideArea(Double lat, Double lon) {
 		String sql = "SELECT MAX(latitude) AS maxLat, MIN(latitude) AS minLat, MAX(longitude) AS maxLon, MIN(longitude) AS minLon " + 
 				"FROM stations " +
@@ -351,6 +352,10 @@ public class StationsDAO {
 	}
 	
 	
+	/**
+	 * Permette di ottenere le coordinate del punto centrale dell'area del sistema.
+	 * @return Un vettore di Double, il primo valore rappresenta la latitudine del centro, il secondo la longitudine.
+	 */
 	public static Double[] getCenterArea() {
 		String sql = "SELECT MAX(latitude) AS maxLat, MIN(latitude) AS minLat, MAX(longitude) AS maxLon, MIN(longitude) AS minLon " + 
 				"FROM stations " +

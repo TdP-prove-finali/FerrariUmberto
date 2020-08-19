@@ -17,7 +17,6 @@ public class StationData {
 	private Integer numDocks;
 	private Double latitude;
 	private Double longitude;
-	private boolean isBroken;
 	
 	
 	public StationData(Integer id, String commonName, Double latitude, Double longitude) {
@@ -30,7 +29,7 @@ public class StationData {
 
 	public StationData(Integer id, String commonName, Integer terminalName, boolean isInstalled, boolean isLocked,
 			LocalDate installDate, LocalDate removalDate, boolean isTemporary, Integer numBikes, Integer numEmptyDocks,
-			Integer numDocks, Double latitude, Double longitude, boolean isBroken) {
+			Integer numDocks, Double latitude, Double longitude) {
 		this.id = id;
 		this.commonName = commonName;
 		this.terminalName = terminalName;
@@ -44,7 +43,6 @@ public class StationData {
 		this.numDocks = numDocks;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.isBroken = isBroken;
 	}
 
 
@@ -118,14 +116,6 @@ public class StationData {
 
 	public void setNumDocks(Integer numDocks) {
 		this.numDocks = numDocks;
-	}
-
-	public boolean isBroken() {
-		return isBroken;
-	}
-
-	public void setBroken(boolean isBroken) {
-		this.isBroken = isBroken;
 	}
 
 	public Integer getId() {
