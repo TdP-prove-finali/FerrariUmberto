@@ -6,35 +6,39 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 
-import it.polito.tdp.CompassBike.DAO.BikesDAO;
+import it.polito.tdp.CompassBike.model.Station.ProblemType;
 
-@SuppressWarnings("unused")
 public class TestModel {
 
 	public static void main(String[] args) {
 		Model model = new Model();
 		
 		LocalDate startDate = LocalDate.of(2020, 05, 20);
-		LocalDate endDate = LocalDate.of(2020, 05, 22);
+		LocalDate endDate = LocalDate.of(2020, 05, 26);
 		
 		Long inizio = System.currentTimeMillis();
 		
 		model.setParametersSimulation(startDate, endDate, 0.0, startDate, endDate);
-		model.setRedistribution(false);
+		model.setRedistribution(true);
 		model.setProbabilityNewStartStation(60.0);
 		model.setNumBikes(14000);
 		model.runSimulation();
 		
 		Map<Integer, Station> res = model.getStationsResult();
+		Integer count = 0;
 		for(Integer id : res.keySet()) {
 			Station st = res.get(id);
 			System.out.println(st.getCommonName()+" "+st.getCompletedRent().size()+" "+st.getCanceledRent().size()+" "+st.getEmptyStationRent().size()+" "+st.getFullStationRent().size());
+			if(st.getProblemType() == ProblemType.NESSUNO)
+				count++;
 		}
 		
 		System.out.println("\n\n");
 		System.out.println("COMPLETATI "+model.getCompletedRent().size());
 		System.out.println("CANCELLATI "+model.getCanceledRent().size());
 		System.out.println("NUM RENT "+model.getNumRent());
+		
+		System.out.println("\nNO PROBLEM "+count);
 		
 		File map = model.getMapsResult();
     	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
@@ -49,9 +53,6 @@ public class TestModel {
 		Long durata = fine - inizio;
 		System.out.println(durata / 1000.0);
 		
-		
-		//USER ST [133, 805, 72, 9002]
-		//5.727
 	}
 
 }

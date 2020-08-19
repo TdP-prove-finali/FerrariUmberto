@@ -3,8 +3,10 @@ package it.polito.tdp.CompassBike.model;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,7 @@ public class Simulator {
 	private Integer numRent;
 	
 	
+	
 	public Simulator() {
 		this.generator = new EventsGenerator();
 	}
@@ -79,11 +82,14 @@ public class Simulator {
 		this.queue.addAll(this.generator.generateEvents());
 		
 		if(this.redistribution) {
-			// TODO Aggiungere eventi di ridistribuzione
+			this.MAX_MOVEMENTS = (int) (this.stations.size() * 0.05);
+			this.MAX_BIKES = (int) (this.numBikes * 0.05);
+			for (LocalDate date = this.startDate; date.isBefore(this.endDate); date = date.plusDays(1)) {
+				this.queue.add(new Event(EventType.RIDISTRIBUZIONE, null, LocalDateTime.of(date, this.TIME_REDISTRIBUTION)));
+			}
 		}
 		
 		this.graph = this.generator.getGraph();
-		//System.out.println("Vertici: "+this.graph.vertexSet().size()+"\nArchi: "+this.graph.edgeSet().size());
 		
 		this.bikes = BikesDAO.getAllBikesSimulator();
 		this.initBike();
@@ -141,7 +147,7 @@ public class Simulator {
 			List<Station> stationsSort = new ArrayList<>(this.stations.values());
 			stationsSort.sort(new Comparator<Station>() {
 		    public int compare(Station o1, Station o2) {
-		    	return o2.getNumDocks() - o1.getNumDocks();
+		    	return -o1.getNumDocks().compareTo(o2.getNumDocks());
 		    }});
 			
 			do {
@@ -160,8 +166,7 @@ public class Simulator {
 				}
 			} while(distribuited < numBikes);
 		}
-
-		System.out.println("Distribuite "+distribuited+" Bici "+numBikes);
+		
 	}
 	
 	
@@ -285,6 +290,9 @@ public class Simulator {
 				startStation.addCanceledRent(bikeRent);
 			}
 			break;
+		case RIDISTRIBUZIONE:
+			this.redistribution();
+			break;
 		}
 			
 	}
@@ -310,8 +318,6 @@ public class Simulator {
 			}
 		}
 		
-		//if(result == null) System.out.println("TORNO NULL "+percentage);
-		
 		return result;
 	}
 	
@@ -323,8 +329,6 @@ public class Simulator {
 	 * @return La {@link Duration durata} casuale
 	 */
 	private Duration getRandomDuration(Station startStation, Station endStation) {
-		//if(endStation == null) System.out.println("END NULL");
-		
 		Random r = new Random();
 		
 		Long rangeMin = this.graph.getEdge(startStation, endStation).getMinDuration().toMinutes();
@@ -485,5 +489,140 @@ public class Simulator {
 	public void setRedistributionType(boolean redistribution) {
 		this.redistribution = redistribution;
 	}
+	
+	
+	
+	private Integer MAX_MOVEMENTS;
+	private Integer MAX_BIKES;
+	private final LocalTime TIME_REDISTRIBUTION = LocalTime.of(4, 0);
+	
+	
+	/**
+	 * Algoritmo di ridistribuzione, bilancia il numero di bici tra le stazioni con un tasso di riempimento maggiore e quelle con un tasso di riempimento minore.
+	 */
+	public void redistribution() {
+		List<Station> listStations = new ArrayList<>(this.stations.values());
+		
+		listStations.sort(new ComparatorStationsBikes());
+		
+		Integer numBikesStCollected = 0;
+		Integer numBikesStDistribuited = 0;
+		Integer numDocksStCollected = 0;
+		Integer numDocksStDistribuited = 0;
+		Integer numEmptyStDistribuited = 0;
+		
+		for(int i = 0; i < this.MAX_MOVEMENTS; i++) {
+			numBikesStCollected += listStations.get(i).getNumBikes();
+			numBikesStDistribuited += listStations.get(listStations.size() - this.MAX_MOVEMENTS + i).getNumBikes();
+			
+			numDocksStCollected += listStations.get(i).getNumDocks();
+			numDocksStDistribuited += listStations.get(listStations.size() - this.MAX_MOVEMENTS + i).getNumDocks();
+			
+			numEmptyStDistribuited += listStations.get(listStations.size() - this.MAX_MOVEMENTS + i).getNumEmptyDocks();
+			
+		}
+		
+		Double fillRate = (((double) numBikesStCollected) + ((double) numBikesStDistribuited)) / (((double) numDocksStCollected) + ((double) numDocksStDistribuited));
+		
+		List<Bike> collectedBikes = new ArrayList<>();
+		Integer[] toCollectSt = new Integer[this.MAX_MOVEMENTS];
+		Integer countStop = 0;
+		
+		do {
+			for(int i = 0; i < this.MAX_MOVEMENTS; i++) {
+				Station st = listStations.get(i);
+				
+				if(toCollectSt[i] == null) {
+					Integer temp = (int) (fillRate * st.getNumDocks());
+					toCollectSt[i] = st.getNumBikes() - temp;
+				}
+				
+				if(toCollectSt[i] > 0 && collectedBikes.size() < this.MAX_BIKES && collectedBikes.size() < numEmptyStDistribuited) {
+					Bike bk = st.getBikes().get(st.getNumBikes() - 1);
+					st.removeBike(bk);
+					
+					bk.setStatus(BikeStatus.DA_DISTRIBUIRE);
+					bk.setStation(null);
+					st.decreaseNumBike(1);
+					st.increaseNumEmpityDocks(1);
+					
+					collectedBikes.add(bk);
+					
+					toCollectSt[i]--;
+				} else {
+					countStop++;
+				}
+			}
+		} while(countStop < this.MAX_MOVEMENTS);
+		
+		
+		Collections.reverse(listStations);
+		
+		Integer[] toDistributeSt = new Integer[this.MAX_MOVEMENTS];
+		countStop = 0;
+		
+		do {
+			for(int i = 0; i < this.MAX_MOVEMENTS; i++) {
+				Station st = listStations.get(i);
+				
+				if(toDistributeSt[i] == null) {
+					Integer temp = (int) (fillRate * st.getNumDocks());
+					toDistributeSt[i] = temp - st.getNumBikes() + 1;
+				}
+				
+				if(toDistributeSt[i] > 0 && !collectedBikes.isEmpty() && st.getNumEmptyDocks() > 0) {
+					Bike bk = collectedBikes.get(collectedBikes.size() - 1);
+					collectedBikes.remove(bk);
+					
+					bk.setStation(st);
+					bk.setStatus(BikeStatus.STAZIONE);
+					st.addBike(bk);
+					st.increaseNumBike(1);
+					st.decreaseNumEmpityDocks(1);
+					
+					toDistributeSt[i]--;
+				} else {
+					countStop++;
+				}
+			}
+		} while(countStop < this.MAX_MOVEMENTS);
+		
+		
+		
+		if(!collectedBikes.isEmpty()) {
+			do {
+				for(int i = 0; i < this.MAX_MOVEMENTS; i++) {
+					Station st = listStations.get(i);
+					
+					if(st.getNumEmptyDocks() > 0) {
+						Bike bk = collectedBikes.get(collectedBikes.size() - 1);
+						collectedBikes.remove(bk);
+						
+						bk.setStation(st);
+						bk.setStatus(BikeStatus.STAZIONE);
+						st.addBike(bk);
+						st.increaseNumBike(1);
+						st.decreaseNumEmpityDocks(1);
+					}
+					
+					if(collectedBikes.isEmpty())
+						break;
+				}
+			} while(!collectedBikes.isEmpty());
+		}
+		
+	}
+	
+	
+	/**
+	 * Classe che permette l'ordinamento delle stazioni a seconda del loro tasso di riempimento
+	 */
+	private class ComparatorStationsBikes implements Comparator<Station> {
+		public int compare(Station o1, Station o2) {
+			Double o1Div = ((double) o1.getNumBikes()) / ((double) o1.getNumDocks());
+			Double o2Div = ((double) o2.getNumBikes()) / ((double) o2.getNumDocks());
+        	return -o1Div.compareTo(o2Div);
+  		}  
+   }	
 	
 }
