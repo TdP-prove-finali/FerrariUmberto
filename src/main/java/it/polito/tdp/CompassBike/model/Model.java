@@ -59,7 +59,7 @@ public class Model {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.variation = variation;
-		this.stations = StationsDAO.getAllStationsSimulator();
+		this.stations = StationsDAO.getAllStations();
 		
 		this.startDatePrint = startDatePrint;
 		this.endDatePrint = endDatePrint;

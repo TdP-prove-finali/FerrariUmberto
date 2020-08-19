@@ -6,14 +6,9 @@ public class StationData {
 	
 	private Integer id;
 	private String commonName;
-	private Integer terminalName;
 	private boolean isInstalled;
-	private boolean isLocked;
 	private LocalDate installDate;
 	private LocalDate removalDate;
-	private boolean isTemporary;
-	private Integer numBikes;
-	private Integer numEmptyDocks;
 	private Integer numDocks;
 	private Double latitude;
 	private Double longitude;
@@ -27,32 +22,18 @@ public class StationData {
 	}
 	
 
-	public StationData(Integer id, String commonName, Integer terminalName, boolean isInstalled, boolean isLocked,
-			LocalDate installDate, LocalDate removalDate, boolean isTemporary, Integer numBikes, Integer numEmptyDocks,
+	public StationData(Integer id, String commonName, boolean isInstalled, LocalDate installDate, LocalDate removalDate, 
 			Integer numDocks, Double latitude, Double longitude) {
 		this.id = id;
 		this.commonName = commonName;
-		this.terminalName = terminalName;
 		this.isInstalled = isInstalled;
-		this.isLocked = isLocked;
 		this.installDate = installDate;
 		this.removalDate = removalDate;
-		this.isTemporary = isTemporary;
-		this.numBikes = numBikes;
-		this.numEmptyDocks = numEmptyDocks;
 		this.numDocks = numDocks;
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
-
-
-	public Integer getTerminalName() {
-		return terminalName;
-	}
-
-	public void setTerminalName(Integer terminalName) {
-		this.terminalName = terminalName;
-	}
+	
 
 	public boolean isInstalled() {
 		return isInstalled;
@@ -60,14 +41,6 @@ public class StationData {
 
 	public void setInstalled(boolean isInstalled) {
 		this.isInstalled = isInstalled;
-	}
-
-	public boolean isLocked() {
-		return isLocked;
-	}
-
-	public void setLocked(boolean isLocked) {
-		this.isLocked = isLocked;
 	}
 
 	public LocalDate getInstallDate() {
@@ -84,30 +57,6 @@ public class StationData {
 
 	public void setRemovalDate(LocalDate removalDate) {
 		this.removalDate = removalDate;
-	}
-
-	public boolean isTemporary() {
-		return isTemporary;
-	}
-	
-	public void setTemporary(boolean isTemporary) {
-		this.isTemporary = isTemporary;
-	}
-
-	public Integer getNumBikes() {
-		return numBikes;
-	}
-
-	public void setNumBikes(Integer numBikes) {
-		this.numBikes = numBikes;
-	}
-
-	public Integer getNumEmptyDocks() {
-		return numEmptyDocks;
-	}
-
-	public void setNumEmptyDocks(Integer numEmpityDocks) {
-		this.numEmptyDocks = numEmpityDocks;
 	}
 
 	public Integer getNumDocks() {

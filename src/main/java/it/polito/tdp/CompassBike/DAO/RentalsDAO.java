@@ -312,7 +312,19 @@ public class RentalsDAO {
 			ResultSet res = st.executeQuery();
 			
 			while (res.next()) {
-				result.add(new GroupRentals(res.getDate("fromDate").toLocalDate(), res.getDate("toDate").toLocalDate(), res.getInt("num")));
+				if(!result.isEmpty()) {
+					GroupRentals lastGroup = result.get(result.size()-1);
+					LocalDate fromDateNew = res.getDate("fromDate").toLocalDate();
+					if(lastGroup.getToDate().plusDays(1).equals(fromDateNew)) {
+						LocalDate fromDate = lastGroup.getFromDate();
+						LocalDate toDate = res.getDate("toDate").toLocalDate();
+						Integer numRentals = lastGroup.getNumRentals() + res.getInt("num");
+						result.remove(result.size()-1);
+						result.add(new GroupRentals(fromDate, toDate, numRentals));
+					} else
+						result.add(new GroupRentals(res.getDate("fromDate").toLocalDate(), res.getDate("toDate").toLocalDate(), res.getInt("num")));
+				} else
+					result.add(new GroupRentals(res.getDate("fromDate").toLocalDate(), res.getDate("toDate").toLocalDate(), res.getInt("num")));
 			}
 			conn.close();
 			return result;

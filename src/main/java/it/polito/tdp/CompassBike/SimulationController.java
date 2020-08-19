@@ -146,9 +146,28 @@ public class SimulationController {
 
     @FXML
     void doSimulation(ActionEvent event) throws Exception {
-    	if(!this.checkNumBikes(event) || !this.checkParameters(event)) {
+    	this.lblIncompleteData.setVisible(false);
+    	/*
+    	if(!this.checkDateSimulation(event)) {
+    		this.lblIncompleteData.setVisible(true);
     		return;
     	}
+    	
+    	if(!this.checkDateData(event)) {
+    		this.lblIncompleteData.setVisible(true);
+    		return;
+    	}*/
+    	
+    	if(!this.checkParameters(event)) {
+    		this.lblIncompleteData.setVisible(true);
+    		return;
+    	}
+    	
+    	if(!this.checkNumBikes(event)) {
+    		this.lblIncompleteData.setVisible(true);
+    		return;
+    	}
+    	
     	
     	if(this.startDate == null || this.endDate == null || this.startDateData == null || this.endDateData == null || this.variation == null || this.probability == null || this.numBikes == null) {
     		this.lblIncompleteData.setVisible(true);
@@ -156,7 +175,6 @@ public class SimulationController {
     		return;
     	}
     	
-    	this.lblIncompleteData.setVisible(false);
     	
     	model.setParametersSimulation(startDateData, endDateData, variation, startDate, endDate);
 	    model.setProbabilityNewStartStation(probability);
@@ -187,16 +205,21 @@ public class SimulationController {
     	this.endDate = this.dateEndSimulation.getValue();
     	
     	if(this.startDate != null && this.endDate != null) {
-    		if(this.startDate.isAfter(this.endDate)) {
-    			this.lblErrorSimulator.setText("La data di inizio non può essere successiva a quella di fine.");
-    			this.btnPlaySimulation.setDisable(true);
-    		} else {
-    			this.gridDateData.setDisable(false);
-    		}
-    		
     		if(this.startDateData != null || this.endDateData != null) {
     			this.clearGridDateData();
     		}
+    		
+    		if(this.startDate.isAfter(this.endDate)) {
+    			this.lblErrorSimulator.setText("La data di inizio non può essere successiva a quella di fine.");
+    			this.btnPlaySimulation.setDisable(true);
+    			return;
+    		} else {
+    			this.gridDateData.setDisable(false);
+    			return;
+    		}
+    	} else {
+    		this.btnPlaySimulation.setDisable(true);
+    		return;
     	}
     }
     
@@ -207,6 +230,7 @@ public class SimulationController {
     	this.lblErrorData.setText("");
     	
     	this.hBoxManual.setVisible(true);
+    	this.btnPlaySimulation.setDisable(true);
     }
     
     
@@ -275,8 +299,14 @@ public class SimulationController {
     		if(!this.model.isDataAvaiable(startDateData, endDateData)) {
     			this.lblErrorData.setText("I dati richiesti non sono disponibili, nella pagina 'Dati noleggi' sono riportati gli intervalli di tempo di cui sono disponibili i dati.");
     			this.btnPlaySimulation.setDisable(true);
+    			return;
     		}
+    		
+		} else {
+			this.btnPlaySimulation.setDisable(true);
+			return;
 		}
+			
     }
     
     
@@ -304,12 +334,12 @@ public class SimulationController {
     	try {
     		this.probability = Double.parseDouble(prob);
     	} catch(NumberFormatException e) {
-    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 5.0% e 100.0%.");
+    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 0.0% e 100.0%.");
     		return false;
     	}
     	
     	if(probability < 0.0 || probability > 100.0) {
-    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 5.0% e 100.0%.");
+    		this.lblErrorParameters.setText("La tendenza degli utenti a cercare un'altra stazione deve essere un numero compreso tra 0.0% e 100.0%.");
     		return false;
     	}
     	
@@ -400,11 +430,15 @@ public class SimulationController {
         this.txtProbabilityNewStation.setText(this.DEFAULT_PROBABILITY.toString());
         
         this.lblIncompleteData.setVisible(false);
+        
+        this.btnPlaySimulation.setDisable(true);
     }
     
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.model.setNumBikesDB();
     	
     	this.numBikesDB = this.model.getNumBikesDB();
     	this.loadNumBikes();
@@ -424,8 +458,6 @@ public class SimulationController {
     
     
     private void loadNumBikes() {
-    	if(this.numBikesDB == null)
-    		System.out.println("NULL NULL");
     	this.txtNumBikes.setText(this.numBikesDB.toString());
     }
     

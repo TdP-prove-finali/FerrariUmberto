@@ -23,13 +23,11 @@ public class DataImport {
 		result[0] = 0;
 		
 		if(!file.isFile()) {
-			System.out.println("File stazioni non trovato!");
 			result[0] = 1;
 			return result;
 		} 
 		
 		if(!Files.isReadable(file.toPath())) {
-			System.out.println("Impossibile leggere il file stazioni!");
 			result[0] = 2;
 			return result;
 		}
@@ -56,13 +54,11 @@ public class DataImport {
 		result[0] = 0;
 		
 		if(!file.isFile()) {
-			System.out.println("File noleggi non trovato!");
 			result[0] = 1;
 			return result;
 		} 
 		
 		if(!Files.isReadable(file.toPath())) {
-			System.out.println("Impossibile leggere il file noleggi!");
 			result[0] = 2;
 			return result;
 		}

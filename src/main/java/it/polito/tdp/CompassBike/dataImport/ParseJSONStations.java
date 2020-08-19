@@ -62,14 +62,8 @@ public class ParseJSONStations {
 					String key = property.getString("key");
 					
 					switch(key) {
-						case "TerminalName":
-							station.setTerminalName(Integer.parseInt(property.getString("value")));
-							break;
 						case "Installed": 
 							station.setInstalled(Boolean.parseBoolean(property.getString("value")));
-							break;
-						case "Locked": 
-							station.setLocked(Boolean.parseBoolean(property.getString("value")));
 							break;
 						case "InstallDate":
 							if(!property.getString("value").isEmpty())
@@ -78,15 +72,6 @@ public class ParseJSONStations {
 						case "RemovalDate":
 							if(!property.getString("value").isEmpty())
 								station.setRemovalDate(LocalDate.ofInstant(Instant.ofEpochMilli(Long.parseLong(property.getString("value"))), TimeZone.getDefault().toZoneId()));
-							break;
-						case "Temporary":
-							station.setTemporary(Boolean.parseBoolean(property.getString("value")));
-							break;
-						case "NbBikes":
-							station.setNumBikes(Integer.parseInt(property.getString("value")));
-							break;
-						case "NbEmptyDocks":
-							station.setNumEmptyDocks(Integer.parseInt(property.getString("value")));
 							break;
 						case "NbDocks":
 							station.setNumDocks(Integer.parseInt(property.getString("value")));

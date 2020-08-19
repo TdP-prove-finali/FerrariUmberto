@@ -73,9 +73,6 @@ public class StationsDataController {
     private TextField txtDocks;
 
     @FXML
-    private TextField txtBikes;
-
-    @FXML
     private TextField txtLat;
 
     @FXML
@@ -92,9 +89,6 @@ public class StationsDataController {
 
     @FXML
     private TextField txtDocksChange;
-
-    @FXML
-    private TextField txtBikesChange;
 
     @FXML
     private JFXButton btnChangeStation;
@@ -161,6 +155,7 @@ public class StationsDataController {
 				this.loadCmdStations();
 			}
 			this.lblResultFileStations.setText(textLbl);
+			this.setNumStations();
 		} else {
 			ChangePage.closeLoadingScreen(loadingStage);
 		}
@@ -182,7 +177,7 @@ public class StationsDataController {
     	try {
     		id = Integer.parseInt(sId);
     	} catch(NumberFormatException e) {
-    		this.lblErrorAddStation.setText("L'ID deve essere un numero intero!");
+    		this.lblErrorAddStation.setText("L'ID deve essere un numero intero.");
     		return;
     	}
     	
@@ -193,38 +188,7 @@ public class StationsDataController {
     	
     	String name = txtName.getText();
     	if(name.length() <= 0 || name == null) {
-    		this.lblErrorAddStation.setText("Inserire un nome!");
-    		return;
-    	}
-    	
-    	String docks = txtDocks.getText();
-    	if(docks == null) {
-    		this.lblErrorAddStation.setText("Si prega di inserire il numero di docks (colonnine) della stazione.");
-    		return;
-    	}
-    	Integer numDocks = null;
-    	try {
-    		numDocks = Integer.parseInt(docks);
-    	} catch(NumberFormatException e) {
-    		this.lblErrorAddStation.setText("Il numero di docks deve essere un numero intero!");
-    		return;
-    	}
-    	
-    	String bikes = txtBikes.getText();
-    	if(bikes == null) {
-    		this.lblErrorAddStation.setText("Si prega di inserire il numero di bici della stazione.");
-    		return;
-    	}
-    	Integer numBikes = null;
-    	try {
-    		numBikes = Integer.parseInt(bikes);
-    	} catch(NumberFormatException e) {
-    		this.lblErrorAddStation.setText("Il numero di bici deve essere un numero intero!");
-    		return;
-    	}
-    	
-    	if(numBikes > numDocks) {
-    		this.lblErrorAddStation.setText("Il numero di bici deve essere minore o uguale del numero di docks!");
+    		this.lblErrorAddStation.setText("Inserire un nome.");
     		return;
     	}
     	
@@ -237,7 +201,7 @@ public class StationsDataController {
     	try {
     		lat = Double.parseDouble(latitude);
     	} catch(NumberFormatException e) {
-    		this.lblErrorAddStation.setText("La latitudine deve essere un numero decimale!");
+    		this.lblErrorAddStation.setText("La latitudine deve essere un numero decimale.");
     		return;
     	}
     	
@@ -250,19 +214,39 @@ public class StationsDataController {
     	try {
     		lon = Double.parseDouble(longitude);
     	} catch(NumberFormatException e) {
-    		this.lblErrorAddStation.setText("La longitudine deve essere un numero decimale!");
+    		this.lblErrorAddStation.setText("La longitudine deve essere un numero decimale.");
     		return;
     	}
     	
     	if(!StationsDAO.isInsideArea(lat, lon)) {
-    		this.lblErrorAddStation.setText("La nuova stazione deve essere all'interno dell'attuale area operativa del servizio!");
+    		this.lblErrorAddStation.setText("La nuova stazione deve essere all'interno dell'attuale area operativa del servizio.");
     		return;
     	}
     	
-    	Integer numEmpty = numDocks - numBikes;
+    	String docks = txtDocks.getText();
+    	if(docks == null) {
+    		this.lblErrorAddStation.setText("Si prega di inserire il numero di docks (colonnine) della stazione.");
+    		return;
+    	}
+    	Integer numDocks = null;
+    	try {
+    		numDocks = Integer.parseInt(docks);
+    	} catch(NumberFormatException e) {
+    		this.lblErrorAddStation.setText("Il numero di docks deve essere un numero intero.");
+    		return;
+    	}
     	
-    	Station station = new Station(id, name, numBikes, numEmpty, numDocks, lat, lon);
+    	if(numDocks <= 0) {
+    		this.lblErrorAddStation.setText("Il numero di docks deve essere un numero intero maggiore di 0.");
+    		return;
+    	}
+    	
+    	Integer numEmpty = numDocks;
+    	
+    	Station station = new Station(id, name, 0, numEmpty, numDocks, lat, lon);
     	StationsDAO.addStationUser(station);
+    	this.setIdUserStation();
+    	this.setNumStations();
     	this.lblErrorAddStation.setText("Stazione inserita correttamente.");
     	this.clearGrid();
     	this.loadCmdStations();
@@ -314,43 +298,23 @@ public class StationsDataController {
     	try {
     		numDocks = Integer.parseInt(docks);
     	} catch(NumberFormatException e) {
-    		this.lblErrorChangeStation.setText("Il numero di docks deve essere un numero intero!");
+    		this.lblErrorChangeStation.setText("Il numero di docks deve essere un numero intero.");
     		return;
     	}
     	
-    	String bikes = txtBikesChange.getText();
-    	if(bikes == null) {
-    		this.lblErrorChangeStation.setText("Si prega di inserire il numero di bici della stazione.");
-    		return;
-    	}
-    	Integer numBikes = null;
-    	try {
-    		numBikes = Integer.parseInt(bikes);
-    	} catch(NumberFormatException e) {
-    		this.lblErrorChangeStation.setText("Il numero di bici deve essere un numero intero!");
-    		return;
-    	}
-    	
-    	if(numBikes > numDocks) {
-    		this.lblErrorChangeStation.setText("Il numero di bici deve essere minore o uguale del numero di docks!");
-    		return;
-    	}
-    	
-    	if(numBikes == selectedStation.getNumBikes() && numDocks == selectedStation.getNumDocks()) {
+    	if(numDocks == selectedStation.getNumDocks()) {
     		this.lblErrorChangeStation.setText("Si prega di modificare i parametri.");
     		return;
     	}
     	
     	selectedStation.setNumDocks(numDocks);
-    	selectedStation.setNumBikes(numBikes);
     	StationsDAO.updateStation(selectedStation);
-    	this.lblErrorChangeStation.setText("Stazione modificata correttamente.");
     	
     	this.txtDocksChange.clear();
-    	this.txtBikesChange.clear();
     	
-    	this.loadCmdStations();
     	this.cmdChangeStation.setValue(null);
+    	
+    	this.lblErrorChangeStation.setText("Stazione modificata correttamente.");
     }
     
 
@@ -365,25 +329,38 @@ public class StationsDataController {
     	}
     	
     	StationsDAO.deleteStationUser(selectedStation);
-    	this.lblErrorDeleteStation.setText("Stazione eliminata correttamente.");
     	
     	this.loadCmdStations();
     	this.cmdDeleteStation.setValue(null);
+    	
+    	this.setIdUserStation();
+    	
+    	this.setNumStations();
+    	
+    	this.lblErrorDeleteStation.setText("Stazione eliminata correttamente.");
     }
     
 
     @FXML
     void doLoadChangeStation(ActionEvent event) {
+    	this.clearLblError();
+    	this.lblErrorChangeStation.setText("");
     	Station selectedStation = this.cmdChangeStation.getValue();
     	if(selectedStation != null) {
     		this.txtDocksChange.setText(selectedStation.getNumDocks().toString());
-    		this.txtBikesChange.setText(selectedStation.getNumBikes().toString());
     	}
+    }
+    
+    
+    @FXML
+    void doOnActionCmdDelete(ActionEvent event) {
+    	this.clearLblError();
     }
     
 
     @FXML
     void doShowMap(ActionEvent event) {
+    	this.clearLblError();
     	File map = this.model.getMapsStations();
     	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
@@ -409,14 +386,12 @@ public class StationsDataController {
         assert txtId != null : "fx:id=\"txtId\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtName != null : "fx:id=\"txtName\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtDocks != null : "fx:id=\"txtDocks\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
-        assert txtBikes != null : "fx:id=\"txtBikes\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtLat != null : "fx:id=\"txtLat\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtLon != null : "fx:id=\"txtLon\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert lblErrorAddStation != null : "fx:id=\"lblErrorAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnAddStation != null : "fx:id=\"btnAddStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnClearGridStation != null : "fx:id=\"btnClearGridStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert txtDocksChange != null : "fx:id=\"txtDocksChange\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
-        assert txtBikesChange != null : "fx:id=\"txtBikesChange\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert btnChangeStation != null : "fx:id=\"btnChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert cmdChangeStation != null : "fx:id=\"cmdChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
         assert lblErrorChangeStation != null : "fx:id=\"lblErrorChangeStation\" was not injected: check your FXML file 'StationsDataImport.fxml'.";
@@ -429,8 +404,7 @@ public class StationsDataController {
     public void setModel(Model model) {
     	this.model = model;
     	
-    	Integer numStations = StationsDAO.getNumStations();
-    	this.lblNumStations.setText("Il database contiene "+numStations+" stazioni.");
+    	this.setNumStations();
     	
     	this.setIdUserStation();
     	
@@ -443,10 +417,15 @@ public class StationsDataController {
     }
     
     
+    public void setNumStations() {
+    	Integer numStations = StationsDAO.getNumStations();
+    	this.lblNumStations.setText("Il database contiene "+numStations+" stazioni.");
+    }
+    
+    
     private void clearGrid() {
     	this.txtName.clear();
     	this.txtDocks.clear();
-    	this.txtBikes.clear();
     	this.txtLat.clear();
     	this.txtLon.clear();
     }

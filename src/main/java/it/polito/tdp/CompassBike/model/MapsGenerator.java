@@ -185,8 +185,6 @@ public class MapsGenerator {
 		result += "<br \\><br \\>";
 		result += "<i>Numero docks: </i>" + station.getNumDocks();
 		result += "<br \\>";
-		result += "<i>Numero bici: </i>" + station.getNumBikes();
-		result += "<br \\>";
 		result += "\"";
 		
 		return result;

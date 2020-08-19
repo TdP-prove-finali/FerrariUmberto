@@ -373,12 +373,12 @@
                   <Insets left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
                <children>
-                  <JFXButton fx:id="btnClear" buttonType="RAISED" onAction="#doClear" ripplerFill="BLACK" styleClass="jbutton" text="Pulisci campi" GridPane.columnIndex="1">
+                  <JFXButton fx:id="btnPlaySimulation" buttonType="RAISED" onAction="#doSimulation" ripplerFill="BLACK" styleClass="jbutton" text="Avvia simulazione">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </JFXButton>
-                  <JFXButton fx:id="btnPlaySimulation" buttonType="RAISED" onAction="#doSimulation" ripplerFill="BLACK" styleClass="jbutton" text="Avvia simulazione">
+                  <JFXButton fx:id="btnClear" buttonType="RAISED" onAction="#doClear" ripplerFill="BLACK" styleClass="jbutton" text="Pulisci campi" GridPane.columnIndex="1">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>

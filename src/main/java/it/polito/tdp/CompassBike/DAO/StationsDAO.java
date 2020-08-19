@@ -20,7 +20,7 @@ public class StationsDAO {
 	 * @param stations La {@link List lista} di {@link StationData stazioni} da aggiungere.
 	 */
 	public static void addStation(List<StationData> stations) {
-		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
+		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
@@ -31,26 +31,21 @@ public class StationsDAO {
 			
 			for(StationData station : stations) {
 				st.setInt(1, station.getId());
-				st.setInt(15, station.getId());
+				st.setInt(9, station.getId());
 				
 				st.setString(2, station.getCommonName());
-				st.setInt(3, station.getTerminalName());
-				st.setBoolean(4, station.isInstalled());
-				st.setBoolean(5, station.isLocked());
+				st.setBoolean(3, station.isInstalled());
 				if(station.getInstallDate() != null)
-					st.setDate(6, Date.valueOf(station.getInstallDate()));
+					st.setDate(4, Date.valueOf(station.getInstallDate()));
 				else
-					st.setDate(6, null);
+					st.setDate(4, null);
 				if(station.getRemovalDate() != null)
-					st.setDate(7, Date.valueOf(station.getRemovalDate()));
+					st.setDate(5, Date.valueOf(station.getRemovalDate()));
 				else
-					st.setDate(7, null);
-				st.setBoolean(8, station.isTemporary());
-				st.setInt(9, station.getNumBikes());
-				st.setInt(10, station.getNumEmptyDocks());
-				st.setInt(11, station.getNumDocks());
-				st.setDouble(12, station.getLatitude());
-				st.setDouble(13, station.getLongitude());
+					st.setDate(5, null);
+				st.setInt(6, station.getNumDocks());
+				st.setDouble(7, station.getLatitude());
+				st.setDouble(8, station.getLongitude());
 				
 				
 				st.addBatch();
@@ -76,28 +71,22 @@ public class StationsDAO {
 	 * @param station La {@link Station stazione} da aggiungere.
 	 */
 	public static void addStationUser(Station station) {
-		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
+		String sql = "INSERT INTO stations VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE station_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
 			PreparedStatement st = conn.prepareStatement(sql);
 			
 			st.setInt(1, station.getId());
-			st.setInt(15, station.getId());
+			st.setInt(9, station.getId());
 			
 			st.setString(2, station.getCommonName());
-			st.setInt(3, 0);
-			st.setBoolean(4, true);
-			st.setBoolean(5, false);
-			st.setDate(6, null);
-			st.setDate(7, null);
-			st.setBoolean(8, false);
-			st.setInt(9, station.getNumBikes());
-			st.setInt(10, station.getNumEmptyDocks());
-			st.setInt(11, station.getNumDocks());
-			st.setDouble(12, station.getLatitude());
-			st.setDouble(13, station.getLongitude());
-			st.setBoolean(14, false);
+			st.setBoolean(3, true);
+			st.setDate(4, null);
+			st.setDate(5, null);
+			st.setInt(6, station.getNumDocks());
+			st.setDouble(7, station.getLatitude());
+			st.setDouble(8, station.getLongitude());
 
 			st.execute();
 
@@ -135,16 +124,15 @@ public class StationsDAO {
 	 * @param station La {@link Station stazione} a cui modificare i parametri.
 	 */
 	public static void updateStation(Station station) {
-		String sql = "UPDATE stations SET num_docks = ?, num_bikes = ? WHERE station_id = ?";
+		String sql = "UPDATE stations SET num_docks = ? WHERE station_id = ?";
 		Connection conn = DBConnect.getConnection();
 		
 	    try {
 			PreparedStatement st = conn.prepareStatement(sql);
 			
 			st.setInt(1, station.getNumDocks());
-			st.setInt(2, station.getNumBikes());
 			
-			st.setInt(3, station.getId());
+			st.setInt(2, station.getId());
 
 			st.execute();
 
@@ -173,7 +161,7 @@ public class StationsDAO {
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				Station station = new Station(res.getInt("station_id"), res.getString("common_name"),
-						res.getInt("num_bikes"), res.getInt("num_empty_docks"), res.getInt("num_docks"), res.getDouble("latitude"), res.getDouble("longitude"));
+						0, res.getInt("num_docks"), res.getInt("num_docks"), res.getDouble("latitude"), res.getDouble("longitude"));
 				
 				result.put(station.getId(), station);
 			}
@@ -196,38 +184,6 @@ public class StationsDAO {
 		String sql = "SELECT * " +
 				"FROM stations " + 
 				"WHERE installed = 1 AND station_id > 9000 " +
-				"ORDER BY station_id";
-		
-		Connection conn = DBConnect.getConnection();
-
-		try {
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-			while (res.next()) {
-				Station station = new Station(res.getInt("station_id"), res.getString("common_name"),
-						res.getInt("num_bikes"), res.getInt("num_empty_docks"), res.getInt("num_docks"), res.getDouble("latitude"), res.getDouble("longitude"));
-				
-				result.put(station.getId(), station);
-			}
-			conn.close();
-			return result;
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	
-	/**
-	 * Permette di ottenere i dati sulle stazioni necessari per eseguire la simulazione, vengono inizializzati i parametri relativi al numero di docks e bici.
-	 * @return La {@link Map mappa} con l'ID come chiave e l'oggetto {@link StationData stazione} come valore.
-	 */
-	public static Map<Integer, Station> getAllStationsSimulator() {
-		Map<Integer, Station> result = new HashMap<>();
-		String sql = "SELECT * " +
-				"FROM stations " + 
-				"WHERE installed = 1 " + 
 				"ORDER BY station_id";
 		
 		Connection conn = DBConnect.getConnection();
@@ -331,12 +287,7 @@ public class StationsDAO {
 				Double maxLon = res.getDouble("maxLon");
 				Double minLon = res.getDouble("minLon");
 				
-				System.out.println(maxLat+" "+minLat);
-				System.out.println(maxLon+" "+minLon);
-				System.out.println(lat+" "+lon);
-				
 				if(lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon) {
-					System.out.println("Entra qui");
 					return true;
 				}
 					

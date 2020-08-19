@@ -44,7 +44,6 @@ public class EventsGenerator {
 	 * @return La {@link List lista} degli eventi generati
 	 */
 	public List<Event> generateEvents() {
-		Long inizio = System.currentTimeMillis();
 		List<Event> result = new ArrayList<>();
 		
 		Random r = new Random();
@@ -107,10 +106,6 @@ public class EventsGenerator {
 			else
 				i--;
 		}
-		
-		Long fine = System.currentTimeMillis();
-		Long durata = fine - inizio;
-		System.out.println("TEMPO GENERAZIONE "+durata / 1000.0+"\n");
 
 		return result;
 	}
@@ -122,7 +117,6 @@ public class EventsGenerator {
 	 * @param endDate Data finale
 	 */
 	public void loadParameters(LocalDate startDate, LocalDate endDate, Map<Integer, Station> stationsIdMap) {
-		Long inizio = System.currentTimeMillis();
 		this.startDate = startDate;
 		this.endDate = endDate;
 		
@@ -142,9 +136,6 @@ public class EventsGenerator {
 		
 		this.setPercentageUserStation();
 		
-		Long fine = System.currentTimeMillis();
-		Long durata = fine - inizio;
-		System.out.println("TEMPO LOAD "+durata / 1000.0+"\n");
 	}
 	
 	
