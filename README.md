@@ -4,7 +4,7 @@
 
 1. Effettuare il fork del repository oppure scaricarlo sotto forma di archivio ZIP.
 2. Importare il progetto in Eclipse, tramite l'archivio scaricato oppure copiando la URI del repository creata nel proprio GitHub a seguito del fork.
-3. Eseguire lo script `bike_sharing_db.sql` contenuto nella cartella `Database` tramite il proprio DBMS.
+3. Eseguire lo script `bike_sharing_db.sql` all'interno dell'archivio ZIP omonimo contenuto nella cartella `Database` tramite il proprio DBMS.
 4. Inserire la password del DBMS utilizzato nel campo `setPassword` all'interno della classe `DBConnect`.
 5. Eseguire la classe `Main` per avviare l'applicazione.
 
