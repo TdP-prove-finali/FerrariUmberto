@@ -109,7 +109,11 @@ public class Simulator {
 	private void initBike() {
 		List<Bike> listBikes = new ArrayList<>(this.bikes.values());
 		listBikes.sort(null);
-		Integer lastId = listBikes.get(listBikes.size()-1).getId();
+		Integer lastId = null;
+		if(listBikes.isEmpty())
+			lastId = 0;
+		else 
+			listBikes.get(listBikes.size()-1).getId();
 		
 		Integer numBikesDB = listBikes.size();
 		
@@ -269,10 +273,11 @@ public class Simulator {
 			startStation.addEmptyStationRent(cloneEmpty);
 			this.emptyStationRent.add(cloneEmpty);
 			
+			// Nuova stazione per prelevare la bici
+			Station newStartStation = this.getNearestFullStation(startStation);
+			
 			Random r = new Random();
-			if(this.probabilityNewStartStation > r.nextDouble()) {
-				// Nuova stazione per prelevare la bici
-				Station newStartStation = this.getNearestFullStation(startStation);
+			if(this.probabilityNewStartStation > r.nextDouble() || newStartStation == null) {
 				Duration durationToNewStartStation = this.graph.getEdge(startStation, newStartStation).getMinDuration();
 				
 				LocalDateTime newStartTime = e.getTime().plus(durationToNewStartStation);

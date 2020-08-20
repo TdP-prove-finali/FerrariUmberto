@@ -73,7 +73,9 @@ public class DataImport {
 		for(RentalData rental : allRentals) {
 			if(stationsIdMap.containsKey(rental.getStartStationId()) && stationsIdMap.containsKey(rental.getEndStationId())) {
 				rentals.add(rental);
-				bikes.add(new BikeData(rental.getBikeId(), rental.getEndStationId()));
+				BikeData bike = new BikeData(rental.getBikeId(), rental.getEndStationId());
+				if(!bikes.contains(bike))
+					bikes.add(bike);
 			}
 		}
 					

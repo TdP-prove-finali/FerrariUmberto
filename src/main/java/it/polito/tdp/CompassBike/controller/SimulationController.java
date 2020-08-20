@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike;
+package it.polito.tdp.CompassBike.controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXRadioButton;
@@ -366,7 +366,7 @@ public class SimulationController {
     	}
     	
     	if(numBikes > this.numMaxBikes) {
-    		this.lblErrorBike.setText("Il numero inserito è maggiore del numero massimo di biciclette utilizzabili!");
+    		this.lblErrorBike.setText("Il numero inserito è maggiore del numero massimo di biciclette utilizzabili.");
     		return false;
     	}
     	
@@ -443,8 +443,8 @@ public class SimulationController {
     	this.numBikesDB = this.model.getNumBikesDB();
     	this.loadNumBikes();
     	
-    	this.numMaxBikes = this.model.getNumDocks();
-    	this.lblMaxBikes.setText("Il numero massimo di biciclette utilizzabili è "+this.numMaxBikes+" (pari al numero di colonnine).");
+    	this.numMaxBikes = (int) (this.model.getNumDocks() * 0.9);
+    	this.lblMaxBikes.setText("Il numero massimo di biciclette utilizzabili è "+this.numMaxBikes+" (pari al 90% del numero di colonnine).");
     	
     	this.numBikes = this.numBikesDB;
     	this.variation = this.DEFAULT_VARIATION;

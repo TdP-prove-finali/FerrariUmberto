@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike;
+package it.polito.tdp.CompassBike.controller;
 
 import it.polito.tdp.CompassBike.model.Model;
 import javafx.fxml.FXMLLoader;

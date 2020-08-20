@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike;
+package it.polito.tdp.CompassBike.controller;
 
 import com.jfoenix.controls.JFXButton;
 
@@ -83,6 +83,18 @@ public class ResultController {
 
     @FXML
     private Label lblFull;
+    
+    @FXML
+    private Label lblStationsNoProblem;
+
+    @FXML
+    private Label lblStationsEmpty;
+
+    @FXML
+    private Label lblStationsTraffic;
+
+    @FXML
+    private Label lblStationsFull;
 
     @FXML
     private TableView<Station> tableStationsResult;
@@ -90,7 +102,8 @@ public class ResultController {
     
     @FXML
     void doShowMap(ActionEvent event) {
-    	File map = this.model.getMapsResult();
+    	MapsGenerator mapsGenerator = new MapsGenerator();
+    	File map = mapsGenerator.generateMapResult(this.model.getStationsResult());
     	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
 				Desktop.getDesktop().browse(map.toURI());
@@ -123,17 +136,21 @@ public class ResultController {
         assert btnResult != null : "fx:id=\"btnResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblResult != null : "fx:id=\"lblResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert gridResult != null : "fx:id=\"gridResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
-        assert btnShowMap != null : "fx:id=\"btnShowMap\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblDateSimulation != null : "fx:id=\"lblDateSimulation\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblVariation != null : "fx:id=\"lblVariation\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblBikes != null : "fx:id=\"lblBikes\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblDateData != null : "fx:id=\"lblDateData\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblNewStation != null : "fx:id=\"lblNewStation\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblRedistribution != null : "fx:id=\"lblRedistribution\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert btnShowMap != null : "fx:id=\"btnShowMap\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblCompleted != null : "fx:id=\"lblCompleted\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblEmpty != null : "fx:id=\"lblEmpty\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblCanceled != null : "fx:id=\"lblCanceled\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblFull != null : "fx:id=\"lblFull\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblStationsNoProblem != null : "fx:id=\"lblStationsNoProblem\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblStationsEmpty != null : "fx:id=\"lblStationsEmpty\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblStationsTraffic != null : "fx:id=\"lblStationsCanceled\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert lblStationsFull != null : "fx:id=\"lblStationsFull\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert tableStationsResult != null : "fx:id=\"tableStationsResult\" was not injected: check your FXML file 'ResultScene.fxml'.";
 
         
@@ -149,6 +166,11 @@ public class ResultController {
     	this.lblCanceled.setText("Noleggi cancellati:");
     	this.lblEmpty.setText("Tentativi di noleggio falliti (stazione vuota):");
     	this.lblFull.setText("Tentativi di riconsegna falliti (stazione piena):");
+    	
+    	this.lblStationsNoProblem.setText("Stazioni che non presentano problemi rilevanti:");
+    	this.lblStationsTraffic.setText("Stazioni ad alto traffico con problemi rilevanti:");
+    	this.lblStationsEmpty.setText("Stazioni spesso vuote:");
+    	this.lblStationsFull.setText("Stazioni spesso piene:");
     	
     	
     	if(!this.noSimulationResult()) {
@@ -172,6 +194,34 @@ public class ResultController {
         	this.lblCanceled.setText(this.lblCanceled.getText()+" "+this.model.getNumCanceledRent());
         	this.lblEmpty.setText(this.lblEmpty.getText()+" "+this.model.getNumEmptyRent());
         	this.lblFull.setText(this.lblFull.getText()+" "+this.model.getNumFullRent());
+        	
+        	
+        	Integer numStationsNoProblem = 0;
+        	Integer numStationsTraffic = 0;
+        	Integer numStationsEmpty = 0;
+        	Integer numStationsFull = 0;
+        	
+        	for(Station st : this.model.getStationsResult().values()) {
+        		switch(st.getProblemType()) {
+				case NESSUNO:
+					numStationsNoProblem++;
+					break;
+				case PIENA:
+					numStationsFull++;
+					break;
+				case TRAFFICO:
+					numStationsTraffic++;
+					break;
+				case VUOTA:
+					numStationsEmpty++;
+					break;
+        		}
+        	}
+        	
+        	this.lblStationsNoProblem.setText(this.lblStationsNoProblem.getText()+" "+numStationsNoProblem);
+        	this.lblStationsTraffic.setText(this.lblStationsTraffic.getText()+" "+numStationsTraffic);
+        	this.lblStationsEmpty.setText(this.lblStationsEmpty.getText()+" "+numStationsEmpty);
+        	this.lblStationsFull.setText(this.lblStationsFull.getText()+" "+numStationsFull);
         	
         	
         	

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="700.0" minWidth="1200.0" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.CompassBike.RentalsDataController">
+<BorderPane minHeight="700.0" minWidth="1200.0" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.CompassBike.controller.RentalsDataController">
    <left>
       <VBox alignment="TOP_CENTER" minHeight="600.0" minWidth="200.0" prefHeight="600.0" prefWidth="250.0" style="-fx-background-color: #F1B434;" BorderPane.alignment="CENTER">
          <children>

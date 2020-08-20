@@ -27,8 +27,6 @@ public class Model {
 	private LocalDate startDatePrint;
 	private LocalDate endDatePrint;
 	
-	private MapsGenerator mapsGenerator;
-	
 	
 	private List<GroupRentals> groupsRentals;
 	private Integer numBikesDB;
@@ -37,7 +35,6 @@ public class Model {
 	
 	public Model() {
 		this.simulator = new Simulator();
-		this.mapsGenerator = new MapsGenerator();
 		
 		this.setGroupsRentals();
 		this.setNumBikesDB();
@@ -129,16 +126,6 @@ public class Model {
 	
 	public Integer getNumFullRent() {
 		return this.simulator.getNumFullRent();
-	}
-	
-	
-	public File getMapsStations() {
-		return this.mapsGenerator.generateMapStations();
-	}
-	
-	
-	public File getMapsResult() {
-		return this.mapsGenerator.generateMapResult(this.stations);
 	}
 
 

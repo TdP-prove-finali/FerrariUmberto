@@ -1,14 +1,13 @@
 package it.polito.tdp.CompassBike;
 
 import javafx.application.Application;
-
+import it.polito.tdp.CompassBike.controller.StationsDataController;
 import it.polito.tdp.CompassBike.model.Model;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-
 
 public class EntryPoint extends Application {
 

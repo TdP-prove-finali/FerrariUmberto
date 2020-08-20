@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike.model;
+package it.polito.tdp.CompassBike.controller;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import it.polito.tdp.CompassBike.DAO.StationsDAO;
+import it.polito.tdp.CompassBike.model.Station;
 
 public class MapsGenerator {
 	

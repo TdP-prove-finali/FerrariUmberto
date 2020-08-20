@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike;
+package it.polito.tdp.CompassBike.controller;
 
 import com.jfoenix.controls.JFXButton;
 
@@ -361,7 +361,9 @@ public class StationsDataController {
     @FXML
     void doShowMap(ActionEvent event) {
     	this.clearLblError();
-    	File map = this.model.getMapsStations();
+    	
+    	MapsGenerator mapsGenerator = new MapsGenerator();
+    	File map = mapsGenerator.generateMapStations();
     	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
 				Desktop.getDesktop().browse(map.toURI());

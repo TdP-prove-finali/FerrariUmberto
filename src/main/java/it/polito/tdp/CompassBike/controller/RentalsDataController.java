@@ -1,4 +1,4 @@
-package it.polito.tdp.CompassBike;
+package it.polito.tdp.CompassBike.controller;
 
 import com.jfoenix.controls.JFXButton;
 
