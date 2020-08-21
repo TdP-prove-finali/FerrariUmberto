@@ -277,7 +277,7 @@ public class Simulator {
 			Station newStartStation = this.getNearestFullStation(startStation);
 			
 			Random r = new Random();
-			if(this.probabilityNewStartStation > r.nextDouble() || newStartStation == null) {
+			if(this.probabilityNewStartStation > r.nextDouble() && newStartStation != null) {
 				Duration durationToNewStartStation = this.graph.getEdge(startStation, newStartStation).getMinDuration();
 				
 				LocalDateTime newStartTime = e.getTime().plus(durationToNewStartStation);

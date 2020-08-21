@@ -26,7 +26,7 @@ public class EntryPoint extends Application {
         scene.getStylesheets().add("/styles/Styles.css");
         
         stage.setResizable(false);
-        stage.setTitle("Compass Bike - Stations Data");
+        stage.setTitle("Compass Bike - Dati stazioni");
         stage.getIcons().add(new Image(EntryPoint.class.getResourceAsStream("/images/icon.png")));
         stage.setScene(scene);
         stage.show();

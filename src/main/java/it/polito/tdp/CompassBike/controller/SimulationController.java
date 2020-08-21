@@ -147,16 +147,6 @@ public class SimulationController {
     @FXML
     void doSimulation(ActionEvent event) throws Exception {
     	this.lblIncompleteData.setVisible(false);
-    	/*
-    	if(!this.checkDateSimulation(event)) {
-    		this.lblIncompleteData.setVisible(true);
-    		return;
-    	}
-    	
-    	if(!this.checkDateData(event)) {
-    		this.lblIncompleteData.setVisible(true);
-    		return;
-    	}*/
     	
     	if(!this.checkParameters(event)) {
     		this.lblIncompleteData.setVisible(true);
