@@ -127,10 +127,11 @@ public class Simulator {
 		List<Bike> listBikes = new ArrayList<>(this.bikes.values());
 		listBikes.sort(null);
 		Integer lastId = null;
-		if(listBikes.isEmpty())
+		if(listBikes.isEmpty()) 
 			lastId = 0;
 		else 
-			listBikes.get(listBikes.size()-1).getId();
+			lastId = listBikes.get(listBikes.size()-1).getId();
+		
 		
 		Integer numBikesDB = listBikes.size();
 		
@@ -141,7 +142,7 @@ public class Simulator {
 			for(int k = numBikesDB; k < numBikes; k++) {
 				listBikes.add(new Bike(++lastId, null, false, BikeStatus.DA_DISTRIBUIRE));
 			}
-		}
+		} 
 		
 		
 		Integer distribuited = 0;
