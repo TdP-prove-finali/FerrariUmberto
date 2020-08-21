@@ -191,6 +191,14 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
+                  <JFXButton fx:id="btnShowChart" buttonType="RAISED" onAction="#doShowChart" ripplerFill="#545454" styleClass="jbutton" text="Mostra grafici" GridPane.columnIndex="1">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <GridPane.margin>
+                        <Insets left="250.0" />
+                     </GridPane.margin>
+                  </JFXButton>
                </children>
                <VBox.margin>
                   <Insets left="10.0" right="10.0" top="5.0" />

@@ -68,7 +68,7 @@ public class MapsGenerator {
 
 	private final String KEY = "'pk.eyJ1IjoidW1mZXJyYXJpIiwiYSI6ImNrZHQ5YnFvZzB6Zmcyd2xpejQxMTlqcmgifQ.4qzD5w0tVvXER5iNPd7Puw'";
 	private final String ZOOM = "11.8";
-	private final String POPUP = "var popup = new mapboxgl.Popup({ offset: 25 }).setHTML("; //Da chiudere con );
+	private final String POPUP = "var popup = new mapboxgl.Popup({ offset: 25 }).setHTML(";
 	private final String MARKER = " var marker = new mapboxgl.Marker({color: ";
 	
 	private final String LEGEND_STATIONS = "<div id=\"legend\" class=\"legend\">\r\n" + 

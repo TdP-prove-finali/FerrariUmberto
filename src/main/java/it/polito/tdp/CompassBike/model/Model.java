@@ -2,6 +2,8 @@ package it.polito.tdp.CompassBike.model;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,8 @@ public class Model {
 
 	private LocalDate startDatePrint;
 	private LocalDate endDatePrint;
+	
+	private Integer dayBetween;
 	
 	
 	private List<GroupRentals> groupsRentals;
@@ -60,6 +64,8 @@ public class Model {
 		
 		this.startDatePrint = startDatePrint;
 		this.endDatePrint = endDatePrint;
+		
+		this.dayBetween = (int) ChronoUnit.DAYS.between(this.startDate, this.startDatePrint);
 	}
 	
 	
@@ -208,6 +214,53 @@ public class Model {
 
 	public boolean getRedistribution() {
 		return redistribution;
+	}
+	
+	public Map<LocalDate, Integer> getNumCompletedRentDay() {
+		Map<LocalDate, Integer> mapResult = new LinkedHashMap<>();
+		Map<LocalDate, Integer> map = this.simulator.getNumCompletedRentDay();
+		
+		for(LocalDate date : map.keySet()) {
+			LocalDate newDate = date.plusDays(this.dayBetween);
+			mapResult.put(newDate, map.get(date));
+		}
+		return mapResult;
+	}
+
+
+	public Map<LocalDate, Integer> getNumCanceledRentDay() {
+		Map<LocalDate, Integer> mapResult = new LinkedHashMap<>();
+		Map<LocalDate, Integer> map = this.simulator.getNumCanceledRentDay();
+
+		for(LocalDate date : map.keySet()) {
+			LocalDate newDate = date.plusDays(this.dayBetween);
+			mapResult.put(newDate, map.get(date));
+		}
+		return mapResult;
+	}
+
+
+	public Map<LocalDate, Integer> getNumEmptyRentDay() {
+		Map<LocalDate, Integer> mapResult = new LinkedHashMap<>();
+		Map<LocalDate, Integer> map = this.simulator.getNumEmptyRentDay();
+
+		for(LocalDate date : map.keySet()) {
+			LocalDate newDate = date.plusDays(this.dayBetween);
+			mapResult.put(newDate, map.get(date));
+		}
+		return mapResult;
+	}
+
+
+	public Map<LocalDate, Integer> getNumFullRentDay() {
+		Map<LocalDate, Integer> mapResult = new LinkedHashMap<>();
+		Map<LocalDate, Integer> map = this.simulator.getNumFullRentDay();
+
+		for(LocalDate date : map.keySet()) {
+			LocalDate newDate = date.plusDays(this.dayBetween);
+			mapResult.put(newDate, map.get(date));
+		}
+		return mapResult;
 	}
 	
 }

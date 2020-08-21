@@ -71,6 +71,9 @@ public class ResultController {
 
     @FXML
     private JFXButton btnShowMap;
+    
+    @FXML
+    private JFXButton btnShowChart;
 
     @FXML
     private Label lblCompleted;
@@ -112,6 +115,11 @@ public class ResultController {
 			}
         }
     }
+    
+    @FXML
+    void doShowChart(ActionEvent event) throws Exception {
+    	ChangePage.showChartStage(this.model);
+    }
 
     @FXML
     void goToRentalsData(ActionEvent event) throws Exception {
@@ -143,6 +151,7 @@ public class ResultController {
         assert lblNewStation != null : "fx:id=\"lblNewStation\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblRedistribution != null : "fx:id=\"lblRedistribution\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert btnShowMap != null : "fx:id=\"btnShowMap\" was not injected: check your FXML file 'ResultScene.fxml'.";
+        assert btnShowChart != null : "fx:id=\"btnShowChart\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblCompleted != null : "fx:id=\"lblCompleted\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblEmpty != null : "fx:id=\"lblEmpty\" was not injected: check your FXML file 'ResultScene.fxml'.";
         assert lblCanceled != null : "fx:id=\"lblCanceled\" was not injected: check your FXML file 'ResultScene.fxml'.";
@@ -281,12 +290,14 @@ public class ResultController {
     private boolean noSimulationResult() {
     	if(this.model.getCompletedRent() == null || this.model.getCanceledRent() == null) {
     		this.btnShowMap.setDisable(true);
+    		this.btnShowChart.setDisable(true);
     		this.gridResult.setVisible(false);
     		this.gridResult.setManaged(false);
     		this.lblResult.setText("Non sono disponibili risultati, si prega di effettuare una simulazione.");
     		return true;
     	} else {
     		this.btnShowMap.setDisable(false);
+    		this.btnShowChart.setDisable(false);
     		return false;
     	}
     }

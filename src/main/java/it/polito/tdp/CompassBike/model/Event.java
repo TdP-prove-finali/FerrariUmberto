@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class Event implements Comparable<Event> {
 	
 	public enum EventType {
-		NOLEGGIO, PRELIEVO, RILASCIO, STAZIONE_VUOTA, STAZIONE_PIENA, RIDISTRIBUZIONE
+		NOLEGGIO, PRELIEVO, RILASCIO, STAZIONE_VUOTA, STAZIONE_PIENA, RIDISTRIBUZIONE, SALVA_DATI
 	}
 	
 	private EventType type;
@@ -120,6 +120,10 @@ public class Event implements Comparable<Event> {
 				return -1;
 			else if(o.type == EventType.PRELIEVO)
 				return 1;
+			else if(this.type == EventType.SALVA_DATI)
+				return 1;
+			else if(o.type == EventType.SALVA_DATI)
+				return -1;
 			else 
 				return this.time.compareTo(o.time);
 		} else

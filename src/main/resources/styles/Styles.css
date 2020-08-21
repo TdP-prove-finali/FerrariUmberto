@@ -61,3 +61,13 @@
     -fx-padding: 0;
     -fx-shape: null;
 }
+
+#chartCompleted .chart-series-line { -fx-stroke: green }
+#chartCanceled .chart-series-line { -fx-stroke: red }
+#chartEmpty .chart-series-line { -fx-stroke: orange }
+#chartFull .chart-series-line { -fx-stroke: blue }
+
+#chartCompleted .chart-line-symbol { -fx-background-color: green }
+#chartCanceled .chart-line-symbol { -fx-background-color: red }
+#chartEmpty .chart-line-symbol { -fx-background-color: orange }
+#chartFull .chart-line-symbol { -fx-background-color: blue }

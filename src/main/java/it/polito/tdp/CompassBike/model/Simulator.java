@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -42,6 +43,8 @@ public class Simulator {
 	
 	private Integer numBikes;
 	
+	private final LocalTime SAVE_DATA_TIME = LocalTime.of(23, 59);
+	
 	// Modello del mondo
 	private Graph<Station, RouteEdge> graph;
 	
@@ -54,6 +57,11 @@ public class Simulator {
 	private List<BikeRent> emptyStationRent;
 	private List<BikeRent> fullStationRent;
 	private Integer numRent;
+	
+	private Map<LocalDate, Integer> numCompletedRentDay;
+	private Map<LocalDate, Integer> numCanceledRentDay;
+	private Map<LocalDate, Integer> numEmptyRentDay;
+	private Map<LocalDate, Integer> numFullRentDay;
 	
 	
 	
@@ -84,9 +92,13 @@ public class Simulator {
 		if(this.redistribution) {
 			this.MAX_MOVEMENTS = (int) (this.stations.size() * 0.05);
 			this.MAX_BIKES = (int) (this.numBikes * 0.05);
-			for (LocalDate date = this.startDate; date.isBefore(this.endDate); date = date.plusDays(1)) {
+			for (LocalDate date = this.startDate; date.isBefore(this.endDate.plusDays(1)); date = date.plusDays(1)) {
 				this.queue.add(new Event(EventType.RIDISTRIBUZIONE, null, LocalDateTime.of(date, this.TIME_REDISTRIBUTION)));
 			}
+		}
+		
+		for(LocalDate date = this.startDate; date.isBefore(this.endDate.plusDays(1)); date = date.plusDays(1)) {
+			this.queue.add(new Event(EventType.SALVA_DATI, null, LocalDateTime.of(date, this.SAVE_DATA_TIME)));
 		}
 		
 		this.graph = this.generator.getGraph();
@@ -99,6 +111,11 @@ public class Simulator {
 		this.emptyStationRent = new ArrayList<>();
 		this.fullStationRent = new ArrayList<>();
 		this.numRent = 0;
+		
+		this.numCompletedRentDay = new LinkedHashMap<>();
+		this.numCanceledRentDay = new LinkedHashMap<>();
+		this.numEmptyRentDay = new LinkedHashMap<>();
+		this.numFullRentDay = new LinkedHashMap<>();
 	}
 
 
@@ -297,6 +314,38 @@ public class Simulator {
 			break;
 		case RIDISTRIBUZIONE:
 			this.redistribution();
+			break;
+		case SALVA_DATI:
+			LocalDate day = e.getTime().toLocalDate();
+			
+			Integer numBefore = 0;
+			for(LocalDate date : this.numCompletedRentDay.keySet()) {
+				numBefore += this.numCompletedRentDay.get(date);
+			}
+			this.numCompletedRentDay.put(day, this.completedRent.size() - numBefore);
+			
+			
+			numBefore = 0;
+			for(LocalDate date : this.numCanceledRentDay.keySet()) {
+				numBefore += this.numCanceledRentDay.get(date);
+			}
+			this.numCanceledRentDay.put(day, this.canceledRent.size() - numBefore);
+			
+			
+			numBefore = 0;
+			for(LocalDate date : this.numEmptyRentDay.keySet()) {
+				numBefore += this.numEmptyRentDay.get(date);
+			}
+			this.numEmptyRentDay.put(day, this.emptyStationRent.size() - numBefore);
+			
+			
+			
+			numBefore = 0;
+			for(LocalDate date : this.numFullRentDay.keySet()) {
+				numBefore += this.numFullRentDay.get(date);
+			}
+			this.numFullRentDay.put(day, this.fullStationRent.size() - numBefore);
+			
 			break;
 		}
 			
@@ -619,6 +668,26 @@ public class Simulator {
 	}
 	
 	
+	public Map<LocalDate, Integer> getNumCompletedRentDay() {
+		return numCompletedRentDay;
+	}
+
+
+	public Map<LocalDate, Integer> getNumCanceledRentDay() {
+		return numCanceledRentDay;
+	}
+
+
+	public Map<LocalDate, Integer> getNumEmptyRentDay() {
+		return numEmptyRentDay;
+	}
+
+
+	public Map<LocalDate, Integer> getNumFullRentDay() {
+		return numFullRentDay;
+	}
+
+
 	/**
 	 * Classe che permette l'ordinamento delle stazioni a seconda del loro tasso di riempimento
 	 */

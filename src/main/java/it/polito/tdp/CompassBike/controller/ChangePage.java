@@ -1,8 +1,10 @@
 package it.polito.tdp.CompassBike.controller;
 
+import it.polito.tdp.CompassBike.EntryPoint;
 import it.polito.tdp.CompassBike.model.Model;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -108,6 +110,27 @@ public class ChangePage {
 	protected static void closeLoadingScreen(Stage stage) {
 		if(stage != null)
 			stage.close();
+	}
+
+
+	public static void showChartStage(Model model) throws Exception {
+		FXMLLoader loader = new FXMLLoader(ChangePage.class.getResource("/fxml/ChartScene.fxml"));
+        BorderPane root = loader.load();
+		
+        ChartController controller = loader.getController();
+		
+		controller.setModel(model);
+		
+		Stage stage = new Stage();
+        
+		Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/Styles.css");
+        
+        stage.setResizable(false);
+        stage.setTitle("Compass Bike - Grafici");
+        stage.getIcons().add(new Image(EntryPoint.class.getResourceAsStream("/images/icon.png")));
+        stage.setScene(scene);
+        stage.show();
 	}
 	
 }
