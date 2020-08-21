@@ -2,11 +2,13 @@ package it.polito.tdp.CompassBike.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -180,20 +182,20 @@ public class EventsGenerator {
 				listDistance.sort(null);
 				Double percentageUserStation = 0.0;
 				for(int i = 0; i < this.NUM_NEAR_STATIONS; i++) {
-					Station st = listDistance.get(i).getEndStation();
-					Double percentageSt = this.percentageStartStations.get(st);
+					Station nearSt = listDistance.get(i).getEndStation();
+					Double percentageSt = this.percentageStartStations.get(nearSt);
 					
 					percentageUserStation += percentageSt * 0.2;
 					percentageSt *= 0.8;
 					
-					this.percentageStartStations.remove(st);
-					this.percentageStartStations.put(st, percentageSt);
+					this.percentageStartStations.remove(nearSt);
+					this.percentageStartStations.put(nearSt, percentageSt);
 					
-					
-					for(RouteEdge edge : this.graph.outgoingEdgesOf(st)) {
+
+					for(RouteEdge edge : this.graph.outgoingEdgesOf(nearSt)) {
 						Station endStation = this.graph.getEdgeTarget(edge);
 						if(!this.graph.containsEdge(userSt, endStation)) {
-							RouteEdge newEdge = new RouteEdge(edge.getMinDuration().plusSeconds(listDistance.get(i).getDistance().intValue()), edge.getMaxDuration().plusSeconds(listDistance.get(i).getDistance().intValue()));
+							RouteEdge newEdge = new RouteEdge(edge.getMinDuration(), edge.getMaxDuration());
 							this.graph.addEdge(userSt, endStation, newEdge);
 							this.graph.setEdgeWeight(newEdge, this.graph.getEdgeWeight(edge));
 						}
@@ -204,7 +206,7 @@ public class EventsGenerator {
 						Double percentageEndUserSt = 0.0;
 						Integer count = 0;
 						Integer first = null;
-						Double percTotal = 0.0;
+
 						for(RouteEdge edge : this.graph.outgoingEdgesOf(startSt)) {
 							for(int j = 0; j < this.NUM_NEAR_STATIONS; j++) {
 								if(this.graph.getEdgeTarget(edge).equals(listDistance.get(j).getEndStation())) {
@@ -215,19 +217,17 @@ public class EventsGenerator {
 							}
 						}
 						
-						if(first != null && count >= this.NUM_NEAR_STATIONS - 2) {
-							for(RouteEdge edge : this.graph.outgoingEdgesOf(startSt)) {
+						
+						if(first != null) {
+							Set<RouteEdge> outgoingEdge = new HashSet<>(this.graph.outgoingEdgesOf(startSt));
+							for(RouteEdge edge : outgoingEdge) {
 								for(int j = 0; j < this.NUM_NEAR_STATIONS; j++) {
 									if(this.graph.getEdgeTarget(edge).equals(listDistance.get(j).getEndStation())) {
-										Double edgeWeight = this.graph.getEdgeWeight(edge);
-										percTotal += edgeWeight;
-										percentageEndUserSt += edgeWeight * 0.2;
-										edgeWeight *= 0.8;
-										this.graph.setEdgeWeight(edge, edgeWeight);
+										percentageEndUserSt += this.graph.getEdgeWeight(edge) * 0.2;
 									}
 								}
 							}
-							
+						
 							RouteEdge edge = this.graph.getEdge(startSt, listDistance.get(first).getEndStation());
 							RouteEdge newEdge = new RouteEdge(edge.getMinDuration().plusSeconds(listDistance.get(i).getDistance().intValue()), edge.getMaxDuration().plusSeconds(listDistance.get(i).getDistance().intValue()));
 							this.graph.addEdge(startSt, userSt, newEdge);

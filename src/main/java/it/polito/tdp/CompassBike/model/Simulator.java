@@ -362,9 +362,13 @@ public class Simulator {
 		Random r = new Random();
 		Station result = null;
 		
-		Double percentage = r.nextDouble() * 100.0;
-		Double cumulative = 0.0;
+		Double total = 0.0;
+		for(Station endStation : Graphs.successorListOf(this.graph, startStation)) {
+			total += this.graph.getEdgeWeight(this.graph.getEdge(startStation, endStation));
+		}
 		
+		Double percentage = r.nextDouble() * total;
+		Double cumulative = 0.0;
 		for(Station endStation : Graphs.successorListOf(this.graph, startStation)) {
 			cumulative += this.graph.getEdgeWeight(this.graph.getEdge(startStation, endStation));
 			result = endStation;
