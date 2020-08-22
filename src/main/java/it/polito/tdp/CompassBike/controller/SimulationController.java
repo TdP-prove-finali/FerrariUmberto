@@ -309,12 +309,12 @@ public class SimulationController {
     	try {
     		this.variation = Double.parseDouble(var);
     	} catch(NumberFormatException e) {
-    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di 0.0%.");
+    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di -100.0%.");
     		return false;
     	}
     	
-    	if(variation < 0.0) {
-    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di 0.0%.");
+    	if(variation < -100.0) {
+    		this.lblErrorParameters.setText("La variazione deve essere un numero maggiore di -100.0%.");
     		return false;
     	}
     	
@@ -346,12 +346,12 @@ public class SimulationController {
     	try {
     		this.numBikes = Integer.parseInt(bikes);
     	} catch(NumberFormatException e) {
-    		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero!");
+    		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero.");
     		return false;
     	}
     	
     	if(numBikes <= 0) {
-    		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero positivo e maggiore di 0!");
+    		this.lblErrorBike.setText("Il numero di biciclette da utilizzare deve essere un numero intero positivo e maggiore di 0.");
     		return false;
     	}
     	

@@ -20,7 +20,7 @@ public class DBConnect {
 			HikariConfig config = new HikariConfig();
 			config.setJdbcUrl(jdbcURL);
 			config.setUsername("root");
-			config.setPassword("passwordDB"); //Inserire qui la password
+			config.setPassword(""); //Inserire qui la password
 			
 			// Configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");

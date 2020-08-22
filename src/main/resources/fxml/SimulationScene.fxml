@@ -299,7 +299,7 @@
                   <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
                <children>
-                  <Label text="Redistribuzione notturna">
+                  <Label text="Ridistribuzione notturna">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>

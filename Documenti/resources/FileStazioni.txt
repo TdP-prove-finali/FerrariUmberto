@@ -1,0 +1,28 @@
+{
+"stations": [
+  {
+    "id": "BikePoints_1",
+    "commonName": "Nome stazione",
+    "additionalProperties": [
+      {
+        "key": "Installed",
+        "value": "true",
+      },
+      {
+        "key": "InstallDate",
+        "value": "1278947280000",
+      },
+      {
+        "key": "RemovalDate",
+        "value": "",
+      },
+      {
+        "key": "NbDocks",
+        "value": "20",
+      }
+    ],
+    "lat": 51.5,
+    "lon": -0.1
+  }
+]
+}
